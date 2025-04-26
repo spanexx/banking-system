@@ -1,0 +1,78 @@
+<div class="admin-dashboard">
+  <div class="dashboard-header">
+    <h1>Admin Dashboard</h1>
+    <p class="subtitle">System overview and management</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon users">
+        <mat-icon>group</mat-icon>
+      </div>
+      <div class="stat-title">Total Users</div>
+      <div class="stat-value">{{ totalUsers }}</div>
+      <div class="stat-change positive">
+        <mat-icon>arrow_upward</mat-icon>
+        <span>{{ userChangePercent | number:'1.0-2' }}% vs last month</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon accounts">
+        <mat-icon>account_balance</mat-icon>
+      </div>
+      <div class="stat-title">Active Accounts</div>
+      <div class="stat-value">{{ totalAccountsCreatedCurrentMonth }}</div>
+      <div class="stat-change positive">
+        <mat-icon>arrow_upward</mat-icon>
+        <span>{{ accountsCreatedChangePercent | number:'1.0-2' }}% vs last month</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon transactions">
+        <mat-icon>sync_alt</mat-icon>
+      </div>
+      <div class="stat-title">Total Transactions</div>
+      <div class="stat-value">{{ totalTransactionsCount }}</div>
+      <div class="stat-change negative">
+        <mat-icon>arrow_downward</mat-icon>
+        <span>{{ transactionsChangePercent | number:'1.0-2' }}% vs last month</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon revenue">
+        <mat-icon>attach_money</mat-icon>
+      </div>
+      <div class="stat-title">Total Revenue</div>
+      <div class="stat-value">${{ totalRevenue | number:'1.2-2' }}</div>
+      <div class="stat-change positive">
+        <mat-icon>arrow_upward</mat-icon>
+        <span>{{ revenueChangePercent | number:'1.0-2' }}% vs last month</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="recent-activity">
+    <h3>Recent Activity</h3>
+    <div class="activity-list">
+      <div class="activity-item" *ngFor="let activity of recentActivities">
+        <div class="activity-icon" [ngClass]="activity.action">
+          <mat-icon>{{ getActivityIcon(activity.action) }}</mat-icon>
+        </div>
+        <div class="activity-details">
+          <div class="activity-title">{{ activity.action }}</div>
+          <div class="activity-meta">{{ activity.date | date:'medium' }}</div>
+        </div>
+        <button mat-button color="primary" class="activity-action" (click)="viewActivityDetails(activity)">
+          View Details
+        </button>
+      </div>
+
+      <div *ngIf="recentActivities.length === 0" class="no-activity">
+        <p>No recent activity to display</p>
+      </div>
+    </div>
+  </div>
+</div>

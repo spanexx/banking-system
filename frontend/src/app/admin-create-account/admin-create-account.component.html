@@ -1,0 +1,82 @@
+<div class="create-account-container">
+  <div class="page-header">
+    <h2>Create New Account</h2>
+    <p class="subtitle">Create a new bank account for an existing user</p>
+  </div>
+
+  <div class="create-account-card">
+    <form (ngSubmit)="createAccount()">
+      <div class="form-section">
+        <h3>Account Details</h3>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Select User</mat-label>
+            <mat-select class="options" [(ngModel)]="selectedUserId" name="userId" required>
+              <mat-option  *ngFor="let user of users" [value]="user._id">
+                {{ user.name }} ({{ user.email }})
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="!selectedUserId">User selection is required</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="account-type-selection">
+          <h3>Account Type</h3>
+          <mat-radio-group [(ngModel)]="newAccount.type" name="type" required>
+            <mat-radio-button value="savings">
+              <div class="account-type-title">Savings Account</div>
+              <div class="account-type-description">For long-term savings with higher interest rates</div>
+            </mat-radio-button>
+            <mat-radio-button value="checking">
+              <div class="account-type-title">Checking Account</div>
+              <div class="account-type-description">For daily transactions and regular banking needs</div>
+            </mat-radio-button>
+            <mat-radio-button value="investment">
+              <div class="account-type-title">investment Account</div>
+              <div class="account-type-description">
+                For investing in stocks, bonds, and other securities
+              </div>
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="initial-deposit">
+            <mat-label>Initial Deposit</mat-label>
+            <input matInput type="number" [(ngModel)]="newAccount.initialDeposit" name="initialDeposit" required min="0">
+            <mat-error *ngIf="newAccount.initialDeposit < 0">Initial deposit cannot be negative</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div *ngIf="selectedUserId && newAccount.type" class="account-preview">
+        <h3>Account Preview</h3>
+        <div class="preview-row">
+          <span class="label">Account Type</span>
+          <span class="value">{{ newAccount.type | titlecase }}</span>
+        </div>
+        <div class="preview-row">
+          <span class="label">Initial Balance</span>
+          <span class="value amount">${{ newAccount.initialDeposit | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button mat-stroked-button type="button" routerLink="/admin/dashboard">Cancel</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="!isFormValid()">
+          Create Account
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="successMessage" class="success-message">
+    <mat-icon>check_circle</mat-icon>
+    {{ successMessage }}
+  </div>
+  
+  <div *ngIf="errorMessage" class="error-message">
+    <mat-icon>error</mat-icon>
+    {{ errorMessage }}
+  </div>
+</div>

@@ -1,0 +1,12 @@
+const express = require('express');
+const router = express.Router();
+const { createUser, getUsers, getUserById, deleteUser, getUserCountByDateRange, getActiveUserCount } = require('../controllers/userController');
+const { protect } = require('../middleware/authMiddleware');
+router.use(protect);
+router.post('/', createUser);
+router.get('/', getUsers);
+router.get('/count', getUserCountByDateRange);
+router.get('/active/count', getActiveUserCount);
+router.get('/:id', getUserById);
+router.delete('/:id', deleteUser);
+module.exports = router;

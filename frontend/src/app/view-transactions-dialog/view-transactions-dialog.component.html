@@ -1,0 +1,14 @@
+<h2 mat-dialog-title>Transactions</h2>
+
+<mat-dialog-content>
+  <div *ngIf="transactions.length === 0">No transactions found for this card.</div>
+  <ul *ngIf="transactions.length > 0">
+    <li *ngFor="let transaction of transactions">
+      {{ transaction.date | date:'short' }} - {{ transaction.type }}: {{ transaction.amount | currency }}
+    </li>
+  </ul>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCloseClick()">Close</button>
+</mat-dialog-actions>

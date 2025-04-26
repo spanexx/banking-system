@@ -1,0 +1,128 @@
+.card-requests-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+
+  .page-header {
+    margin-bottom: 2rem;
+
+    h2 {
+      color: #1a237e;
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #1a237e, #283593);
+        border-radius: 2px;
+      }
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 1rem;
+    }
+  }
+
+  .requests-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .error-container {
+    text-align: center;
+    padding: 2rem;
+
+    .error-message {
+      color: #f44336;
+      margin-bottom: 1rem;
+    }
+  }
+
+  .requests-table {
+    width: 100%;
+
+    th {
+      background-color: #f5f5f5;
+      color: #1a237e;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    td {
+      color: #333;
+    }
+
+    th, td {
+      padding: 1rem;
+    }
+
+    .mat-mdc-row:hover {
+      background-color: #f8f9fa;
+    }
+
+    button[mat-icon-button] {
+      opacity: 0.8;
+      transition: opacity 0.2s;
+
+      &:hover:not([disabled]) {
+        opacity: 1;
+      }
+    }
+  }
+
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 16px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    background-color: #e0e0e0;
+    color: #616161;
+
+    &.pending-status {
+      background-color: #fff3e0;
+      color: #e65100;
+    }
+  }
+
+  .no-data-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    color: #666;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 1rem;
+      color: #ccc;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin: 0;
+    }
+  }
+}

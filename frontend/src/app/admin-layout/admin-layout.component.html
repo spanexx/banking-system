@@ -1,0 +1,90 @@
+<!-- Loading Bar -->
+<div class="loading-bar" [class.loading]="isLoading"></div>
+
+<div class="layout-container">
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu-overlay" [class.active]="isMobileMenuOpen" (click)="toggleSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.collapsed]="isSidebarCollapsed">
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <img src="/images/logo.png" alt="SimpliBank Logo" class="logo" *ngIf="!isSidebarCollapsed">
+        <span class="logo-text" *ngIf="!isSidebarCollapsed">SimpliBank Admin</span>
+      </div>
+      <button mat-icon-button class="toggle-button" (click)="toggleSidebar()">
+        <mat-icon>{{ isSidebarCollapsed ? 'menu' : 'menu_open' }}</mat-icon>
+      </button>
+    </div>
+
+    <nav class="navigation">
+      <a mat-button class="nav-item" routerLink="/admin/dashboard" routerLinkActive="active">
+        <fa-icon [icon]="dashboardIcon"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">Dashboard</span>
+      </a>
+
+      <a mat-button class="nav-item" routerLink="/admin/users" routerLinkActive="active">
+        <fa-icon [icon]="usersIcon"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">Users</span>
+      </a>
+
+      <a mat-button class="nav-item" routerLink="/admin/create-transaction" routerLinkActive="active">
+        <fa-icon [icon]="transactionsIcon"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">Transactions</span>
+      </a>
+
+      <a mat-button class="nav-item" routerLink="/admin/create-user" routerLinkActive="active">
+        <fa-icon [icon]="createUserIcon"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">Create User</span>
+      </a>
+
+      <a mat-button class="nav-item" routerLink="/admin/create-account" routerLinkActive="active">
+        <fa-icon [icon]="createAccountIcon"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">Create Account</span>
+      </a>
+
+      <a [routerLink]="['/admin/transfer-requests']" routerLinkActive="active" class="nav-item">
+        <fa-icon [icon]="transferRequestsIcon"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">Transfer Requests</span>
+      </a>
+
+      <a [routerLink]="['/admin/card-requests']" routerLinkActive="active" class="nav-item">
+        <fa-icon [icon]="cardRequestsIcon"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">Card Requests</span>
+      </a>
+
+      <a [routerLink]="['/admin/settings']" routerLinkActive="active" class="nav-item">
+        <fa-icon [icon]="settingsIcon"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button mat-button class="nav-item" (click)="logout()">
+        <fa-icon [icon]="logoutIcon"></fa-icon>
+        <span *ngIf="!isSidebarCollapsed">Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+      <div class="mobile-menu">
+        <button mat-icon-button (click)="toggleSidebar()" *ngIf="isSidebarCollapsed">
+          <mat-icon>menu</mat-icon>
+        </button>
+      </div>
+
+      <div class="admin-info">
+        <span class="admin-name">{{ adminName }}</span>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,189 @@
+@use '../shared/styles/layout' as layout;
+
+:host {
+  display: block;
+  height: 100vh;
+}
+
+.layout-container {
+  @include layout.layout-container;
+}
+
+.sidebar {
+  @include layout.sidebar-base;
+  transform: none;
+  transition: transform 0.3s ease, width 0.3s ease;
+
+  .sidebar-header {
+    @include layout.sidebar-header;
+
+    .logo-container {
+      .logo {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        transition: all 0.3s ease;
+      }
+
+      .logo-text {
+        color: #1a237e;
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-left: 0.5rem;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .navigation {
+    @include layout.navigation;
+  }
+
+  .sidebar-footer {
+    @include layout.sidebar-footer;
+  }
+
+  &.collapsed:not(.mobile-open) {
+    @media (min-width: 769px) {
+      width: layout.$sidebar-width-collapsed;
+      overflow-x: hidden; // Add this line to hide horizontal overflow when collapsed
+      
+      .logo-container {
+        justify-content: center;
+        
+        .logo-text {
+          opacity: 0;
+          width: 0;
+          overflow: hidden;
+          white-space: normal; // Allow wrapping or proper hiding
+        }
+      }
+
+      .nav-item {
+        padding: 0.75rem;
+        justify-content: center;
+
+        fa-icon {
+          margin-right: 0;
+          font-size: 1.2rem;
+        }
+
+        span {
+          opacity: 0;
+          width: 0;
+          overflow: hidden;
+          white-space: normal; // Allow wrapping or proper hiding
+        }
+      }
+    }
+  }
+
+  &.mobile-open {
+    transform: translateX(0);
+  }
+}
+
+.main-content {
+  @include layout.main-content;
+  
+  & {
+    transition: margin-left 0.3s ease;
+  }
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  // Adjust margin when sidebar is collapsed
+  // &.collapsed {
+  //   // margin-left handled by flexbox
+  // }
+
+  .top-nav {
+    padding: 0.75rem 1.25rem;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+
+    .mobile-menu {
+      display: none;
+      @media (max-width: 768px) {
+        display: flex;
+        align-items: center;
+        margin-right: 1rem;
+      }
+    }
+
+    .admin-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .admin-name {
+        font-weight: 500;
+        color: layout.$text-primary;
+      }
+    }
+  }
+
+  &:has(.sidebar.collapsed) {
+    @media (min-width: 769px) {
+      // margin-left is handled by flexbox in the parent container
+    }
+  }
+
+  .content {
+    padding: 2rem;
+    @media (max-width: 768px) {
+      padding: 1rem;
+    }
+  }
+}
+
+.mobile-menu-overlay {
+  @include layout.overlay;
+}
+
+.loading-bar {
+  @include layout.loading-bar;
+}
+
+// Responsive styles
+@include layout.mobile {
+  .sidebar {
+    position: fixed;
+    z-index: 1000;
+  }
+
+  .main-content {
+    .mobile-menu {
+      display: block;
+    }
+  }
+}
+
+// Menu styles
+::ng-deep {
+  .mat-menu-panel {
+    min-width: 200px !important;
+  }
+
+  .mat-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    fa-icon {
+      color: layout.$text-secondary;
+    }
+
+    &:hover {
+      fa-icon {
+        color: layout.$primary-color;
+      }
+    }
+  }
+}

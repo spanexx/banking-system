@@ -1,0 +1,222 @@
+.create-user-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+
+  .page-header {
+    margin-bottom: 2rem;
+
+    h2 {
+      color: #1a237e;
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #1a237e, #283593);
+        border-radius: 2px;
+      }
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 1rem;
+    }
+  }
+
+  .create-user-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+    form {
+      display: grid;
+      gap: 1.5rem;
+
+      .form-section {
+        margin-bottom: 2rem;
+
+        h3 {
+          color: #1a237e;
+          font-size: 1.25rem;
+          font-weight: 500;
+          margin-bottom: 1.5rem;
+          padding-bottom: 0.5rem;
+          border-bottom: 1px solid #eee;
+        }
+
+        .form-row {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+
+          mat-form-field {
+            width: 100%;
+          }
+        }
+      }
+
+      .role-selection {
+        margin: 1rem 0;
+
+        .mat-radio-group {
+          display: flex;
+          gap: 1.5rem;
+          flex-wrap: wrap;
+        }
+
+        .mat-radio-button {
+          .mat-radio-label {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+
+            &:hover {
+              background-color: rgba(26, 35, 126, 0.05);
+            }
+          }
+        }
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #eee;
+
+        button {
+          min-width: 120px;
+          padding: 0.75rem 1.5rem;
+
+          &[type="submit"] {
+            background: linear-gradient(45deg, #1a237e, #283593);
+            color: white;
+
+            &:hover {
+              background: linear-gradient(45deg, #283593, #1a237e);
+            }
+
+            &:disabled {
+              background: #ccc;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .user-preview {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+
+    h3 {
+      color: #1a237e;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .preview-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .label {
+        color: #666;
+        font-weight: 500;
+      }
+
+      .value {
+        font-weight: 600;
+        color: #1a237e;
+      }
+    }
+  }
+
+  .success-message,
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .success-message {
+    background: rgba(76, 175, 80, 0.1);
+    color: #2e7d32;
+  }
+
+  .error-message {
+    background: rgba(244, 67, 54, 0.1);
+    color: #d32f2f;
+  }
+}
+
+@media (max-width: 600px) {
+  .create-user-container {
+    margin: 1rem;
+    padding: 0;
+  }
+
+  .create-user-card {
+    padding: 1.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .role-selection {
+    .mat-radio-group {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .create-user-container {
+    margin: 1rem;
+    padding: 0;
+
+    .create-user-card {
+      padding: 1.5rem;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+}

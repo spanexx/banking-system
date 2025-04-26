@@ -1,6 +1,11 @@
 <div class="transfer-requests-container">
   <div class="page-header">
     <h2>Transfer Requests Management</h2>
+    <div class="header-actions">
+      <button mat-icon-button (click)="loadTransferRequests()" matTooltip="Refresh">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
     <p class="subtitle">Manage and monitor transfer requests</p>
   </div>
 

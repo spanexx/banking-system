@@ -22,8 +22,7 @@ import { CancellationReasonDialogComponent } from '../../src/app/admin/cancellat
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    MatDialogModule,
-    CancellationReasonDialogComponent
+    MatDialogModule
   ],
   templateUrl: './transfer-request-manager.component.html',
   styleUrls: ['./transfer-request-manager.component.scss']
@@ -141,20 +140,21 @@ export class TransferRequestManagerComponent implements OnInit {
       return;
     }
 
-    const dialogRef = this.dialog.open(CancellationReasonDialogComponent, {
-      width: '400px',
-      data: {}
-    });
+    // First get the transaction to get its ID
+    this.transactionService.getTransactionByRequestId(request._id).subscribe({
+      next: (transaction) => {
+        if (transaction && transaction._id) {
+          const dialogRef = this.dialog.open(CancellationReasonDialogComponent, {
+            width: '400px',
+            data: {}
+          });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const description = result;
-        this.isLoading = true;
-
-        // First get the transaction associated with the request
-        this.transactionService.getTransactionByRequestId(request._id).subscribe({
-          next: (transaction) => {
-            if (transaction && transaction._id) {
+          dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+              this.isLoading = true;
+              // Format the description to include transaction ID
+              const description = `For transaction ${transaction.transactionId}-${result}`;
+              
               // Update transaction status to Cancelled
               this.transactionService.updateTransactionStatus(transaction._id, 'Cancelled').subscribe({
                 next: () => {
@@ -179,21 +179,21 @@ export class TransferRequestManagerComponent implements OnInit {
                 }
               });
             } else {
-              this.showError('No transaction found for this request');
-              this.isLoading = false;
+              console.log('Cancellation reason dialog closed without input.');
             }
-          },
-          error: (error) => {
-            console.error('Error fetching transaction:', error);
-            this.showError('Failed to fetch transaction details');
-            this.isLoading = false;
-          }
-        });
-      } else {
-        console.log('Cancellation reason dialog closed without input.');
+          });
+        } else {
+          this.showError('No transaction found for this request');
+          this.isLoading = false;
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching transaction:', error);
+        this.showError('Failed to fetch transaction details');
+        this.isLoading = false;
       }
     });
-}
+  }
 
   deleteRequest(requestId: string | undefined): void {
     if (!requestId) {

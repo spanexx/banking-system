@@ -41,6 +41,7 @@ h2 {
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
   }
+  
 
   h3 {
     color: #2196f3;
@@ -119,6 +120,33 @@ mat-list {
   padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
+
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    button[mat-icon-button] {
+      background-color: rgba(25, 118, 210, 0.08);
+      color: #1565c0;
+      transition: all 0.3s ease;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+
+      &:hover {
+        background-color: rgba(25, 118, 210, 0.15);
+        transform: rotate(180deg);
+      }
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
 
   .welcome-section {
     margin-bottom: 3rem;

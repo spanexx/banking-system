@@ -1,7 +1,12 @@
 <div class="card-requests-container">
   <div class="page-header">
-    <h2>Card Request Manager</h2>
-    <p class="subtitle">Manage and process card requests</p>
+    <h2>Card Requests Management</h2>
+    <div class="header-actions">
+      <button mat-icon-button (click)="getPendingRequests()" matTooltip="Refresh">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+    <p class="subtitle">Manage and monitor card requests</p>
   </div>
 
   <mat-card class="requests-card">

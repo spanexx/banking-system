@@ -20,6 +20,7 @@ import { SupportMessagesComponent } from './admin/support-messages/support-messa
 import { OpenAccountRequestComponent } from './open-account-request/open-account-request.component';
 import { TransferRequestManagerComponent } from './admin/transfer-request-manager/transfer-request-manager.component';
 import { CardRequestManagerComponent } from './admin/card-request-manager/card-request-manager.component';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -59,5 +60,6 @@ export const routes: Routes = [
       { path: 'transfer-requests', component: TransferRequestManagerComponent },
       { path: 'card-requests', component: CardRequestManagerComponent }
     ]
-  }
+  },
+  { path: '**', component: NotFoundComponent }
 ];

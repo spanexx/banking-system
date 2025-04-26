@@ -1,4 +1,10 @@
 <div class="dashboard-container">
+  <div class="dashboard-header">
+  <div><h1>Dashboard</h1></div>
+  <div><button mat-icon-button (click)="loadDashboardData()" matTooltip="Refresh Dashboard">
+    <mat-icon>refresh</mat-icon>
+  </button></div>
+</div>
   <!-- Welcome Section -->
   <div class="welcome-section">
     <h1>Welcome back, {{ currentUser?.name }}.</h1>

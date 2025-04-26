@@ -172,4 +172,21 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  loadDashboardData(): void {
+    this.loading = true;
+    this.error = null;
+    
+    // Load user accounts
+    this.loadAccounts();
+    
+    // Load recent transactions
+    this.loadRecentTransactions();
+    
+    // Load transaction summary
+    this.loadTransactionSummary();
+    
+    // Update loading state when all data is loaded
+    this.loading = false;
+  }
+
 }

@@ -1,16 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const { createAccount, getAccounts,
-        getAllAccounts, getAccountById, getAccountsByUserId, getAccountCountByDateRange, getCurrentlyActiveAccountCount } = require('../controllers/accountController'); // Import necessary controllers
+const accountController = require('../controllers/accountController');
 const { protect } = require('../middleware/authMiddleware');
 
+// Protect all routes
 router.use(protect);
-router.post('/', createAccount);
-router.get('/', getAccounts);
-router.get('/all', getAllAccounts); // New route for getting all accounts
-router.get('/count', getAccountCountByDateRange); // Route for account count by date range
-router.get('/active/count', getCurrentlyActiveAccountCount); // Route for active account count
-router.get('/:id', getAccountById); // Route to get account by ID
-router.get('/user/:userId', getAccountsByUserId); // New route to get accounts by user ID
+
+// Place specific routes before parameter routes
+router.post('/', accountController.createAccount);
+router.get('/', accountController.getAccounts);
+router.get('/all', accountController.getAllAccounts);
+router.get('/count', accountController.getAccountCountByDateRange);
+router.get('/active/count', accountController.getCurrentlyActiveAccountCount);
+router.get('/balance-change', accountController.getBalanceChange);
+
+// Parameter routes should come last
+router.get('/user/:userId', accountController.getAccountsByUserId);
+router.get('/:id', accountController.getAccountById);
 
 module.exports = router;

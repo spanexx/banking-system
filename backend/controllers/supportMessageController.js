@@ -1,6 +1,7 @@
 const supportMessageService = require('../services/supportMessageService');
 const path = require('path');
-const SupportMessage = require('../models/supportMessage'); // Fixed case sensitivity
+const SupportMessage = require('../models/supportMessage');
+const { createNotification } = require('./notificationController');
 
 // @desc    Create a new support message
 // @route   POST /api/support
@@ -23,26 +24,24 @@ const createSupportMessage = async (req, res) => {
       });
     }
 
-    // Handle image data
-    if (req.body.image && req.body.image.length > 10485760) { // 10MB limit
-      return res.status(400).json({ message: 'Image size should be less than 10MB' });
-    }
-
     // Create the support message
     const createdMessage = await supportMessageService.createMessage({
       ...req.body,
-      status: 'open' // Ensure status is set to open for new messages
+      status: 'open'
     });
+
+    // Create a notification for the user using the centralized function
+    await createNotification(
+      req.user._id,
+      'info',
+      `Your support message "${subject}" has been received.`
+    );
 
     console.log('Support message created successfully');
     res.status(201).json(createdMessage);
   } catch (error) {
     console.error('Error creating support message:', error);
-    res.status(500).json({ 
-      message: 'Error creating support message', 
-      error: error.message,
-      details: error.errors // Include mongoose validation errors if any
-    });
+    res.status(500).json({ message: 'Error creating support message' });
   }
 };
 

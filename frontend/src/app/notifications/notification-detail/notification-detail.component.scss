@@ -1,0 +1,204 @@
+.notification-detail-container {
+  padding: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+  }
+
+  mat-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    mat-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid #e0e0e0;
+
+      mat-card-title {
+        margin: 0;
+        font-size: 24px;
+        line-height: 1.2;
+      }
+    }
+
+    mat-card-content {
+      padding: 24px;
+
+      .notification-info {
+        .notification-type {
+          display: flex;
+          align-items: center;
+          margin-bottom: 24px;
+          padding: 12px;
+          border-radius: 8px;
+          background-color: #f5f5f5;
+
+          mat-icon {
+            margin-right: 12px;
+            font-size: 28px;
+            width: 28px;
+            height: 28px;
+
+            &.info { color: #1976d2; }
+            &.warning { color: #ffa000; }
+            &.success { color: #43a047; }
+            &.error { color: #d32f2f; }
+          }
+
+          .type-label {
+            font-size: 18px;
+            font-weight: 500;
+          }
+        }
+
+        .notification-message {
+          margin-bottom: 24px;
+          padding: 16px;
+          background-color: #ffffff;
+          border: 1px solid #e0e0e0;
+          border-radius: 8px;
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+
+          h3 {
+            margin: 0 0 12px 0;
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+          }
+
+          p {
+            margin: 0;
+            line-height: 1.6;
+            color: #444;
+            font-size: 15px;
+          }
+        }
+
+        .notification-metadata {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 16px;
+          background-color: #fafafa;
+          padding: 16px;
+          border-radius: 8px;
+
+          .metadata-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .label {
+              font-size: 13px;
+              color: #666;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+
+            .value {
+              font-size: 15px;
+              color: #333;
+
+              &.read-status {
+                color: #757575;
+              }
+
+              &.unread-status {
+                color: #1976d2;
+                font-weight: 500;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    mat-card-actions {
+      display: flex;
+      justify-content: flex-end;
+      padding: 16px;
+      gap: 12px;
+      border-top: 1px solid #e0e0e0;
+    }
+  }
+}
+
+// Responsive styles
+@media screen and (max-width: 600px) {
+  .notification-detail-container {
+    padding: 8px;
+
+    mat-card {
+      mat-card-header {
+        padding: 16px;
+
+        mat-card-title {
+          font-size: 20px;
+        }
+      }
+
+      mat-card-content {
+        padding: 16px;
+
+        .notification-info {
+          .notification-type {
+            padding: 8px;
+            margin-bottom: 16px;
+
+            mat-icon {
+              font-size: 24px;
+              width: 24px;
+              height: 24px;
+            }
+
+            .type-label {
+              font-size: 16px;
+            }
+          }
+
+          .notification-message {
+            padding: 12px;
+
+            h3 {
+              font-size: 15px;
+              margin-bottom: 8px;
+            }
+
+            p {
+              font-size: 14px;
+            }
+          }
+
+          .notification-metadata {
+            padding: 12px;
+            grid-template-columns: 1fr;
+            gap: 12px;
+
+            .metadata-item {
+              .label {
+                font-size: 12px;
+              }
+
+              .value {
+                font-size: 14px;
+              }
+            }
+          }
+        }
+      }
+
+      mat-card-actions {
+        padding: 12px;
+        flex-direction: column-reverse;
+        
+        button {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

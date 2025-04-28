@@ -21,6 +21,8 @@ import { OpenAccountRequestComponent } from './open-account-request/open-account
 import { TransferRequestManagerComponent } from './admin/transfer-request-manager/transfer-request-manager.component';
 import { CardRequestManagerComponent } from './admin/card-request-manager/card-request-manager.component';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { NotificationListComponent } from './notifications/notification-list/notification-list.component';
+import { NotificationDetailComponent } from './notifications/notification-detail/notification-detail.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -43,6 +45,9 @@ export const routes: Routes = [
       { path: 'verify-request', component: VerifyRequestComponent },
       { path: 'cards', component: CardsComponent },
       { path: 'products', component: ProductsComponent },
+      { path: 'support', component: SupportComponent },
+      {path: 'notifications', component: NotificationListComponent},
+      {path: 'notifications/:id', component: NotificationDetailComponent},
     ]
   },
   {

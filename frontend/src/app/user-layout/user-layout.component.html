@@ -43,7 +43,7 @@
         <span *ngIf="!isSidebarCollapsed">Products</span>
       </a>
 
-      <a mat-button class="nav-item" routerLink="/support" routerLinkActive="active">
+      <a mat-button class="nav-item" routerLink="/user/support" routerLinkActive="active">
         <fa-icon [icon]="supportIcon"></fa-icon>
         <span *ngIf="!isSidebarCollapsed">Support</span>
       </a>
@@ -69,19 +69,15 @@
 
       <div class="user-info">
         <button mat-icon-button [matMenuTriggerFor]="notificationsMenu" class="notification-bell">
-          <fa-icon [icon]="bellIcon" [matBadge]="notificationCount" matBadgeColor="warn" 
-                  [matBadgeHidden]="notificationCount === 0"></fa-icon>
+          <mat-icon [matBadge]="notificationCount" matBadgeColor="warn" 
+                   [matBadgeHidden]="notificationCount === 0">notifications</mat-icon>
         </button>
-        <!-- <button mat-button [matMenuTriggerFor]="profileMenu" class="profile-button">
-          <img [src]="userAvatar" [alt]="userName" class="avatar" *ngIf="userAvatar">
-          <span class="user-name">{{ userName }}</span>
-          <fa-icon [icon]="chevronIcon"></fa-icon>
-        </button> -->
       </div>
     </nav>
 
     <!-- Notification Menu -->
     <mat-menu #notificationsMenu="matMenu" class="notifications-menu">
+      <div class="noti">
       <div class="menu-header">
         <h3>Notifications</h3>
         <button mat-button color="primary" (click)="markAllRead()">
@@ -89,10 +85,9 @@
         </button>
       </div>
       <div class="notification-list">
-        <button mat-menu-item *ngFor="let notification of notifications" 
-                [class.unread]="!notification.read">
-          <fa-icon [icon]="getNotificationTypeIcon(notification.type)" 
-                  [class]="notification.type"></fa-icon>
+        <button mat-menu-item *ngFor="let notification of notifications"
+                 [class.unread]="!notification.read" (click)="markAsRead(notification)">
+          <mat-icon [class]="notification.type">{{ getNotificationIcon(notification.type) }}</mat-icon>
           <span class="notification-content">
             <span class="notification-message">{{ notification.message }}</span>
             <span class="notification-time">{{ notification.time | date:'short' }}</span>
@@ -100,10 +95,11 @@
         </button>
       </div>
       <div class="menu-footer">
-        <button mat-button color="primary" routerLink="/notifications">
+        <button mat-button color="primary" routerLink="/user/notifications">
           View all notifications
         </button>
       </div>
+    </div>
     </mat-menu>
 
     <!-- Profile Menu -->

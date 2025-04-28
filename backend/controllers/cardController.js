@@ -1,7 +1,8 @@
 const Card = require('../models/card');
-const Account = require('../models/account'); // Assuming you need to interact with Account model
-const Transaction = require('../models/transaction'); // Assuming you need to interact with Transaction model
+const Account = require('../models/account');
+const Transaction = require('../models/transaction');
 const CardTransaction = require('../models/cardTransaction');
+const { createNotification } = require('./notificationController');
 
 // Get all cards associated with a specific account
 exports.getCardsByAccountId = async (req, res) => {
@@ -15,25 +16,31 @@ exports.getCardsByAccountId = async (req, res) => {
 };
 
 // Request a new card for a user/account
-exports.requestNewCard = async (req, res) => {
+exports.requestNewCard = async (req, res, skipResponse = false) => {
   try {
     const { accountNumber, IBAN, cardType } = req.body;
 
     // Basic validation
     if ((!accountNumber && !IBAN) || !cardType) {
-      return res.status(400).json({ message: 'Either Account Number or IBAN, and card type are required.' });
+      if (!skipResponse) {
+        return res.status(400).json({ message: 'Either Account Number or IBAN, and card type are required.' });
+      }
+      throw new Error('Either Account Number or IBAN, and card type are required.');
     }
 
     // Find the account by account number or IBAN
     let account;
     if (accountNumber) {
-      account = await Account.findOne({ accountNumber });
+      account = await Account.findOne({ accountNumber }).populate('user');
     } else if (IBAN) {
-      account = await Account.findOne({ IBAN });
+      account = await Account.findOne({ IBAN }).populate('user');
     }
 
     if (!account) {
-      return res.status(404).json({ message: 'Account not found with the provided Account Number or IBAN.' });
+      if (!skipResponse) {
+        return res.status(404).json({ message: 'Account not found with the provided Account Number or IBAN.' });
+      }
+      throw new Error('Account not found with the provided Account Number or IBAN.');
     }
 
     // Generate unique card number and CVV (simplified for now)
@@ -45,8 +52,8 @@ exports.requestNewCard = async (req, res) => {
       }
       return result;
     };
-    const cardNumber = '4' + generateRandomNumber(15); // Simple Visa-like number
-    const cvv = generateRandomNumber(3); // Simple 3-digit CVV
+    const cardNumber = '4' + generateRandomNumber(15);
+    const cvv = generateRandomNumber(3);
 
     // Calculate expiry date (e.g., 3 years from now)
     const expiryDate = new Date();
@@ -57,20 +64,32 @@ exports.requestNewCard = async (req, res) => {
       cardNumber,
       cardType,
       expiryDate,
-      cvv, // In a real application, handle CVV securely (encryption, not storing, etc.)
+      cvv,
     });
 
     await newCard.save();
 
-    // Optionally, add the new card's ID to the associated account
     account.cards.push(newCard._id);
     await account.save();
 
+    // Create a notification for the user whose card was created
+    await createNotification(
+      account.user._id,
+      'success',
+      `Your new ${cardType} card has been requested successfully.`
+    );
 
-    res.status(201).json(newCard);
+    if (!skipResponse) {
+      res.status(201).json(newCard);
+    }
+    
+    return newCard;
   } catch (error) {
-    console.error('Error in requestNewCard:', error); // Log the error on the backend
-    res.status(500).json({ message: 'Internal Server Error', error: error.message }); // Include error message in response
+    console.error('Error in requestNewCard:', error);
+    if (!skipResponse) {
+      res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+    throw error;
   }
 };
 
@@ -84,11 +103,24 @@ exports.toggleFreezeCard = async (req, res) => {
       return res.status(400).json({ message: 'isFrozen must be a boolean value.' });
     }
 
-    const card = await Card.findByIdAndUpdate(cardId, { isFrozen }, { new: true });
+    const card = await Card.findById(cardId).populate({
+      path: 'account',
+      populate: { path: 'user' }
+    });
 
     if (!card) {
       return res.status(404).json({ message: 'Card not found.' });
     }
+
+    card.isFrozen = isFrozen;
+    await card.save();
+
+    // Create a notification for the user whose card was frozen/unfrozen
+    await createNotification(
+      card.account.user._id,
+      isFrozen ? 'warning' : 'success',
+      `Your card (${card.cardNumber.slice(-4)}) has been ${isFrozen ? 'frozen' : 'unfrozen'}.`
+    );
 
     res.status(200).json(card);
   } catch (error) {
@@ -120,7 +152,6 @@ exports.getCardTransactions = async (req, res) => {
     const cardId = req.params.cardId;
     // Assuming transactions have a reference to the card used
     const transactions = await CardTransaction.find({ card: cardId }).populate('card'); 
-    console.log(transactions); 
     res.status(200).json(transactions);
   } catch (error) {
     res.status(500).json({ message: error.message });

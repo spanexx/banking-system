@@ -75,8 +75,15 @@ $small-screen: 480px;
   }
 
   .toggle-button {
-    @media (max-width: $mobile-breakpoint) {
-      display: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: $text-secondary;
+    transition: color $transition-duration ease;
+
+    &:hover {
+      color: $primary-color;
     }
   }
 }
@@ -294,12 +301,17 @@ $small-screen: 480px;
 
 // Mobile Menu
 @mixin mobile-menu {
+  display: none; // Hide by default
+  
   @media (max-width: $mobile-breakpoint) {
     display: flex;
     align-items: center;
 
     button {
       margin-right: 1rem;
+      display: flex !important; // Force display
+      align-items: center;
+      justify-content: center;
     }
   }
 }

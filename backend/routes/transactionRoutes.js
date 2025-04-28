@@ -3,7 +3,7 @@ const router = express.Router();
 const { createTransaction, getTransactions, getAllTransactions, getTransactionsByUserId, updateTransactionStatus, getTransactionByRequestId, createCardTransaction, cancelTransactionRequestAndReturnFunds } = require('../controllers/transactionController');
 const { protect } = require('../middleware/authMiddleware');
 router.use(protect);
-router.post('/', createTransaction);
+// router.post('/', createTransaction);
 router.get('/', getTransactions);
 router.get('/all', getAllTransactions);
 router.get('/user/:userId', getTransactionsByUserId);

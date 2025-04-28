@@ -2,7 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const path = require('path'); // Require the path module
+const path = require('path');
+const http = require('http');
+const { Server } = require('socket.io');
 
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -13,10 +15,44 @@ const transferRequestRoutes = require('./routes/transferRequestRoutes');
 const supportMessageRoutes = require('./routes/supportMessageRoutes');
 const cardRoutes = require('./routes/cardRoutes');
 const requestCardRoutes = require('./routes/requestCardRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 const User = require('./models/user');
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: ["http://localhost:4200"],
+    methods: ["GET", "POST"],
+    credentials: true,
+    allowedHeaders: ["Authorization"]
+  }
+});
+
+// Make app globally accessible for Socket.IO
+global.app = app;
+
+// WebSocket connection handling
+io.on('connection', (socket) => {
+  console.log('Client connected');
+  
+  // Authenticate user and join their room
+  socket.on('authenticate', (userId) => {
+    if (userId) {
+      socket.join(`user_${userId}`);
+      console.log(`User ${userId} authenticated and joined their room`);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+});
+
+// Make io accessible to other modules
+app.set('io', io);
+
 app.use(bodyParser.json());
 
 app.use('/api/auth', authRoutes);
@@ -28,6 +64,7 @@ app.use('/api/transfer-requests', transferRequestRoutes);
 app.use('/api/support', supportMessageRoutes);
 app.use('/api/cards', cardRoutes);
 app.use('/api/card-requests', requestCardRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Serve static files from the 'uploads' directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -65,6 +102,6 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
       console.log('Admin user already exists.');
     }
 
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch(err => console.error(err));

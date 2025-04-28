@@ -1,11 +1,20 @@
 const User = require('../models/user');
 const ActivityLog = require('../models/activityLog');
+const { createNotification } = require('./notificationController');
 
 exports.createUser = async (req, res) => {
   const { name, email, password, role } = req.body;
   const userExists = await User.findOne({ email });
   if (userExists) return res.status(400).json({ message: 'User already exists' });
   const user = await User.create({ name, email, password, role });
+
+  // Create a notification using the centralized function
+  await createNotification(
+    user._id,
+    'info',
+    `Welcome to SimpliBank, ${name}! Your account has been created successfully.`
+  );
+
   await ActivityLog.create({ user: req.user._id, action: 'Create User', metadata: { createdUser: user._id } });
   res.status(201).json(user);
 };

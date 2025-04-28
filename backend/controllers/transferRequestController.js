@@ -1,31 +1,7 @@
-const nodemailer = require('nodemailer');
-const TransferRequest = require('../models/requestTransfer');
-const ActivityLog = require('../models/activityLog');
-const Account = require('../models/account');
+const RequestTransfer = require('../models/requestTransfer');
 const Transaction = require('../models/transaction');
-
-// Configure mailer
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: process.env.SMTP_SECURE === 'true',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  },
-  tls: {
-    rejectUnauthorized: false
-  }
-});
-
-// Verify transporter connection
-transporter.verify(function(error, success) {
-  if (error) {
-    console.log('SMTP connection error:', error);
-  } else {
-    console.log('SMTP server is ready');
-  }
-});
+const ActivityLog = require('../models/activityLog');
+const { createNotification } = require('./notificationController');
 
 // @desc    Create transfer request and send verification code
 // @route   POST /api/transfer-requests
@@ -61,7 +37,7 @@ exports.createRequest = async (req, res) => {
     }
 
     // Create pending request
-    const transferRequest = await TransferRequest.create({
+    const transferRequest = await RequestTransfer.create({
       requestedBy: req.user._id,
       fromAccount: fromAccountId,
       toAccount: toAccount,
@@ -153,79 +129,79 @@ exports.createRequest = async (req, res) => {
 // @desc    Verify transfer code and execute transaction
 // @route   POST /api/transfer-requests/verify
 // @access  Private
-exports.verifyRequest = async (req, res) => {
+exports.verifyTransferRequest = async (req, res) => {
+  const { code } = req.body;
+  const transfer = await RequestTransfer.findOne({ 
+    requestedBy: req.user._id, 
+    status: 'pending',
+    verificationCodeExpiry: { $gt: new Date() }
+  });
+
+  if (!transfer) {
+    return res.status(404).json({ message: 'No pending transfer request found or verification code expired' });
+  }
+  
+  if (transfer.code !== code) {
+    return res.status(400).json({ message: 'Invalid verification code' });
+  }
+
   try {
-    const { requestId, code } = req.body;
-    const transfer = await TransferRequest.findById(requestId);
-    
-    if (!transfer) {
-      return res.status(404).json({ message: 'Request not found' });
-    }
-    
-    if (transfer.status !== 'pending') {
-      return res.status(400).json({ message: 'Request already processed' });
-    }
-    
-    if (transfer.codeExpires < new Date()) {
-      transfer.status = 'failed';
-      await transfer.save();
-      return res.status(400).json({ message: 'Verification code expired' });
-    }
-    
-    if (transfer.code !== code) {
-      return res.status(400).json({ message: 'Invalid verification code' });
-    }
-
-    try {
-      // Execute the transaction using the static method
-      const transaction = await Transaction.createTransaction({
-        accountId: transfer.fromAccount,
-        receiverIdentifier: transfer.toAccount,
-        type: 'transfer',
-        amount: transfer.amount,
-        description: transfer.description,
-        swiftCode: transfer.swiftCode,
-        date: new Date(),
-        userId: req.user._id,
-        bankName: transfer.bankName || 'SimpliBank',
-        receiverName: transfer.accountHolderName || 'International Recipient',
-        requestTransferId: transfer._id // Link the transaction to the transfer request
-      });
-
-      // Update transfer request status
-      transfer.status = 'approved';
-      await transfer.save();
-
-      await ActivityLog.create({
-        user: req.user._id,
-        action: 'Verified Transfer',
-        metadata: { 
-          transferRequest: transfer._id,
-          transaction: transaction._id,
-          isInternational: transaction._doc?.message ? true : false,
-          bankName: transfer.bankName,
-          receiverName: transfer.accountHolderName
-        }
-      });
-
-      // Send response with international transfer message if present
-      res.json({ 
-        message: transaction._doc?.message || 'Transfer completed successfully',
-        transaction,
-        isInternational: !!transaction._doc?.message
-      });
-
-    } catch (error) {
-      transfer.status = 'failed';
-      await transfer.save();
-      throw error;
-    }
-  } catch (error) {
-    console.error('Transfer verification error:', error);
-    res.status(500).json({ 
-      message: 'Error verifying transfer', 
-      error: error.message 
+    // Execute the transaction using the static method
+    const transaction = await Transaction.createTransaction({
+      accountId: transfer.fromAccount,
+      receiverIdentifier: transfer.toAccount,
+      type: 'transfer',
+      amount: transfer.amount,
+      description: transfer.description,
+      swiftCode: transfer.swiftCode,
+      date: new Date(),
+      userId: req.user._id,
+      bankName: transfer.bankName || 'SimpliBank',
+      receiverName: transfer.accountHolderName || 'International Recipient',
+      requestTransferId: transfer._id
     });
+
+    // Update transfer request status
+    transfer.status = 'approved';
+    await transfer.save();
+
+    // Create a notification using the centralized function
+    await createNotification(
+      req.user._id,
+      'success',
+      `Your transfer request to ${transfer.toAccount} for ${transfer.amount} has been approved.`
+    );
+
+    await ActivityLog.create({
+      user: req.user._id,
+      action: 'Verified Transfer',
+      metadata: { 
+        transferRequest: transfer._id,
+        transaction: transaction._id,
+        isInternational: transaction._doc?.message ? true : false,
+        bankName: transfer.bankName,
+        receiverName: transfer.accountHolderName
+      }
+    });
+
+    res.json({ 
+      message: transaction._doc?.message || 'Transfer completed successfully',
+      transaction,
+      isInternational: !!transaction._doc?.message
+    });
+
+  } catch (error) {
+    transfer.status = 'failed';
+    await transfer.save();
+
+    // Create a failure notification using the centralized function
+    await createNotification(
+      req.user._id,
+      'error',
+      `Your transfer request to ${transfer.toAccount} for ${transfer.amount} has failed.`
+    );
+
+    res.status(400).json({ message: error.message });
   }
 };
 
@@ -234,7 +210,7 @@ exports.verifyRequest = async (req, res) => {
 // @access  Private
 exports.getTransferRequests = async (req, res) => {
   try {
-    const transferRequests = await TransferRequest.find({}).sort({ date: -1 });
+    const transferRequests = await RequestTransfer.find({}).sort({ date: -1 });
     res.json(transferRequests);
   } catch (error) {
     console.error('Error fetching transfer requests:', error);
@@ -247,24 +223,15 @@ exports.getTransferRequests = async (req, res) => {
 // @access  Private/Admin
 exports.manageTransferRequest = async (req, res) => {
   try {
-    const { status } = req.body; // 'approved' or 'rejected'
-    const transferRequest = await TransferRequest.findById(req.params.id);
+    const { id } = req.params;
+    const { status } = req.body;
 
+    const transferRequest = await RequestTransfer.findById(id);
     if (!transferRequest) {
       return res.status(404).json({ message: 'Transfer request not found' });
     }
 
-    if (transferRequest.status !== 'pending') {
-      return res.status(400).json({ message: `Transfer request already ${transferRequest.status}` });
-    }
-
     if (status === 'approved') {
-      // For admin approval, we might not need the verification code flow,
-      // or we could trigger the transaction directly here.
-      // Assuming admin approval bypasses user verification for now.
-      // If the original request was pending user verification, this admin action overrides it.
-
-      // Execute the transaction
       const transaction = await Transaction.createTransaction({
         accountId: transferRequest.fromAccount,
         receiverIdentifier: transferRequest.toAccount,
@@ -273,17 +240,24 @@ exports.manageTransferRequest = async (req, res) => {
         description: transferRequest.description,
         swiftCode: transferRequest.swiftCode,
         date: new Date(),
-        userId: transferRequest.requestedBy, // Use the user who requested the transfer
+        userId: transferRequest.requestedBy,
         bankName: transferRequest.bankName || 'SimpliBank',
         receiverName: transferRequest.accountHolderName || 'International Recipient',
-        requestTransferId: transferRequest._id // Link the transaction to the transfer request
+        requestTransferId: transferRequest._id
       });
 
       transferRequest.status = 'approved';
       await transferRequest.save();
 
+      // Create an approval notification using the centralized function
+      await createNotification(
+        transferRequest.requestedBy,
+        'success',
+        `Your transfer request to ${transferRequest.toAccount} for ${transferRequest.amount} has been approved by an admin.`
+      );
+
       await ActivityLog.create({
-        user: req.user._id, // Logged by the admin user
+        user: req.user._id,
         action: 'Managed Transfer (Approved)',
         metadata: {
           transferRequest: transferRequest._id,
@@ -300,13 +274,19 @@ exports.manageTransferRequest = async (req, res) => {
         transaction,
         isInternational: !!transaction._doc?.message
       });
-
     } else if (status === 'rejected') {
       transferRequest.status = 'rejected';
       await transferRequest.save();
 
+      // Create a rejection notification using the centralized function
+      await createNotification(
+        transferRequest.requestedBy,
+        'error',
+        `Your transfer request to ${transferRequest.toAccount} for ${transferRequest.amount} has been rejected by an admin.`
+      );
+
       await ActivityLog.create({
-        user: req.user._id, // Logged by the admin user
+        user: req.user._id,
         action: 'Managed Transfer (Rejected)',
         metadata: {
           transferRequest: transferRequest._id,
@@ -314,14 +294,16 @@ exports.manageTransferRequest = async (req, res) => {
         }
       });
 
-      res.json({ message: 'Transfer request rejected successfully' });
+      res.json({
+        message: 'Transfer request rejected successfully',
+        transferRequest
+      });
     } else {
-      return res.status(400).json({ message: 'Invalid status provided. Use "approved" or "rejected".' });
+      res.status(400).json({ message: 'Invalid status provided' });
     }
-
   } catch (error) {
     console.error('Error managing transfer request:', error);
-    res.status(500).json({ message: 'Error managing transfer request', error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -330,7 +312,7 @@ exports.manageTransferRequest = async (req, res) => {
 // @access  Private/Admin
 exports.deleteTransferRequest = async (req, res) => {
   try {
-    const transferRequest = await TransferRequest.findById(req.params.id);
+    const transferRequest = await RequestTransfer.findById(req.params.id);
 
     if (!transferRequest) {
       return res.status(404).json({ message: 'Transfer request not found' });

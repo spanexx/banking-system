@@ -49,4 +49,9 @@ export class AccountService {
     const headers = this.getAuthHeaders();
     return this.http.get<any>(`${this.apiUrl}/active/count`, { headers });
   }
+
+  getBalanceChange(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get<any>(`${this.apiUrl}/balance-change`, { headers });
+  }
 }

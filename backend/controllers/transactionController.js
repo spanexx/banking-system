@@ -1,6 +1,7 @@
 const Transaction = require('../models/transaction');
 const Account = require('../models/account');
 const ActivityLog = require('../models/activityLog');
+const { createNotification } = require('./notificationController');
 const RequestTransfer = require('../models/requestTransfer');
 const nodemailer = require('nodemailer');
 
@@ -21,11 +22,10 @@ const generateRandomId = (length = 12) => {
   return result;
 };
 
-const createTransaction = async (req, res) => {
+exports.createTransaction = async (req, res) => {
   try {
     const { accountId, receiverIdentifier, type, amount, swiftCode, date, description, bankName, receiverName } = req.body;
-    console.log('Received request to create transaction:', req.body);
-
+    
     const transaction = await Transaction.createTransaction({
       accountId,
       receiverIdentifier,
@@ -40,6 +40,13 @@ const createTransaction = async (req, res) => {
       isAdmin: req.user.role === 'admin'
     });
 
+    // Use the centralized notification creation function
+    await createNotification(
+      req.user._id,
+      'success',
+      `Transaction of ${amount} ${transaction.currency} to ${receiverName || receiverIdentifier} completed successfully.`
+    );
+
     res.status(201).json(transaction);
   } catch (error) {
     console.error('Transaction creation error:', error);
@@ -49,7 +56,6 @@ const createTransaction = async (req, res) => {
 
 const getTransactions = async (req, res) => {
   const txns = await Transaction.find({ userId: req.user._id }).populate('toAccount', 'accountNumber').populate('fromAccount', 'accountNumber').sort('-date'); // Filter by user ID
-  console.log(txns);
   res.json(txns);
 };
 
@@ -72,7 +78,6 @@ const getAllTransactions = async (req, res) => {
   }
 
   const txns = await Transaction.find(filter).populate('toAccount', 'accountNumber').populate('fromAccount', 'accountNumber').sort('-date'); // Fetch all transactions and populate account numbers
-  console.log(txns);
   res.json(txns);
 };
 
@@ -110,7 +115,6 @@ const getTransactionsByUserId = async (req, res) => {
       return txn;
     });
 
-    console.log(modifiedTxns);
     res.json(modifiedTxns);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -302,7 +306,6 @@ const cancelTransactionRequestAndReturnFunds = async (req, res) => {
 };
 
 module.exports = {
-  createTransaction,
   getTransactions,
   getAllTransactions,
   getTransactionsByUserId,

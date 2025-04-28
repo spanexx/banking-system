@@ -9,6 +9,14 @@
   @include layout.layout-container;
 }
 
+.noti{
+  background-color: whitesmoke
+}
+
+.mobile-menu {
+  @include layout.mobile-menu;
+}
+
 .sidebar {
   @include layout.sidebar-base;
   
@@ -158,6 +166,32 @@
 
       .notification-bell {
         position: relative;
+        margin-right: 8px;
+
+        mat-icon {
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+        }
+
+        ::ng-deep .mat-badge-content {
+          font-size: 10px;
+          width: 8px;
+          height: 8px;
+          line-height: 18px;
+          right: -8px !important;
+          top: -8px !important;
+          background-color: #f44336;
+          font-weight: 600;
+          border: 2px solid #fff;
+          border-radius: 50%;
+        }
+
+        &:hover {
+          mat-icon {
+            color: #1565c0;
+          }
+        }
       }
     }
   }
@@ -206,11 +240,19 @@
 
       mat-icon {
         margin-top: 0.25rem;
-
-        &.info { color: #2196f3; }
-        &.warning { color: #ff9800; }
-        &.success { color: #4caf50; }
-        &.error { color: #f44336; }
+        
+        &.info { 
+          color: #2196f3; 
+        }
+        &.warning { 
+          color: #ff9800; 
+        }
+        &.success { 
+          color: #4caf50; 
+        }
+        &.error { 
+          color: #f44336; 
+        }
       }
 
       .notification-content {
@@ -218,16 +260,22 @@
         display: flex;
         flex-direction: column;
         gap: 0.25rem;
+        margin-left: 8px;
 
         .notification-message {
           font-size: 0.9rem;
           line-height: 1.4;
+          color: rgba(0, 0, 0, 0.87);
         }
 
         .notification-time {
           font-size: 0.75rem;
           color: rgba(0, 0, 0, 0.6);
         }
+      }
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
       }
     }
   }

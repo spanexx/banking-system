@@ -39,6 +39,7 @@ export class DashboardComponent implements OnInit {
   error: string | null = null;
   monthlyIncome: number = 0;
   monthlyExpenses: number = 0;
+  balanceChangePercent: number = 0;
 
   constructor(
     private transactionService: TransactionService,
@@ -52,6 +53,25 @@ export class DashboardComponent implements OnInit {
     this.loadAccounts();
     this.loadRecentTransactions();
     this.loadTransactionSummary();
+    this.loadBalanceChange();
+  }
+
+  loadBalanceChange() {
+    if (this.currentUser?._id) {
+      this.accountService.getBalanceChange().subscribe({
+        next: (response) => {
+          this.balanceChangePercent = response.percentageChange;
+        },
+        error: (error: Error) => {
+          console.error('Error loading balance change:', error);
+          this.error = error.message;
+        }
+      });
+    }
+  }
+
+  getBalanceChange(): number {
+    return this.balanceChangePercent;
   }
 
   loadAccounts() {
@@ -70,12 +90,6 @@ export class DashboardComponent implements OnInit {
 
   getTotalBalance(): number {
     return this.accounts.reduce((total, account) => total + account.balance, 0);
-  }
-
-  getBalanceChange(): number {
-    // This would typically come from comparing current vs previous month balance
-    // For now returning a mock value
-    return 5.2;
   }
 
   getBalanceChangeClass(): string {

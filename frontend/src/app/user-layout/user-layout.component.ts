@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatDividerModule } from '@angular/material/divider';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { 
-  faUniversity, 
-  faRightFromBracket, 
-  faUser, 
-  faBell, 
+import {
+  faUniversity,
+  faRightFromBracket,
+  faUser,
+  faBell,
   faChevronDown,
   faDashboard,
   faPiggyBank,
@@ -28,16 +28,9 @@ import {
   faHeadset
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../services/auth.service';
-import { Router, NavigationEnd, NavigationStart } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { NotificationService, Notification } from '../services/notification.service';
+import { Subscription } from 'rxjs';
 
-interface Notification {
-  id: string;
-  type: 'info' | 'warning' | 'success' | 'error';
-  message: string;
-  time: Date;
-  read: boolean;
-}
 
 @Component({
   selector: 'app-user-layout',
@@ -55,11 +48,12 @@ interface Notification {
   templateUrl: './user-layout.component.html',
   styleUrl: './user-layout.component.scss'
 })
-export class UserLayoutComponent implements OnInit {
+export class UserLayoutComponent implements OnInit, OnDestroy {
   isSidebarCollapsed = false;
   notificationCount = 0;
   notifications: Notification[] = [];
   userName: string = '';
+  private notificationsSubscription: Subscription | undefined;
   userAvatar: string = 'assets/images/default-avatar.png';
   userProfileIcon = faUser;
   bankLogo = faUniversity;
@@ -85,44 +79,31 @@ export class UserLayoutComponent implements OnInit {
   isLoading = false;
 
   constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {
-    // Handle route change loading states
-    this.router.events.pipe(
-      filter(event => 
-        event instanceof NavigationStart || 
-        event instanceof NavigationEnd
-      )
-    ).subscribe(event => {
-      if (event instanceof NavigationStart) {
-        this.isLoading = true;
-      } else if (event instanceof NavigationEnd) {
-        this.isLoading = false;
-        // Close mobile menu on navigation
-        if (this.isMobileMenuOpen) {
-          this.isMobileMenuOpen = false;
-          this.isSidebarCollapsed = true;
-        }
-      }
-    });
-  }
+    private router: Router,
+    private notificationService: NotificationService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
-    this.loadUserProfile();
-    this.loadNotifications();
-
-    // Check for saved sidebar state
-    const savedState = localStorage.getItem('sidebarState');
-    if (savedState) {
-      this.isSidebarCollapsed = JSON.parse(savedState);
+    // Get current user ID and connect to WebSocket
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.notificationService.connect(currentUser._id);
     }
 
-    // Check screen size on init
+    // Load initial notifications
+    this.loadNotifications();
+    this.subscribeToNotifications();
+    this.loadUserProfile();
     this.checkScreenSize();
+  }
 
-    // Listen for window resize events
-    window.addEventListener('resize', () => this.checkScreenSize());
+  ngOnDestroy() {
+    // Clean up WebSocket connection and subscriptions
+    this.notificationService.disconnect();
+    if (this.notificationsSubscription) {
+      this.notificationsSubscription.unsubscribe();
+    }
   }
 
   loadUserProfile() {
@@ -135,25 +116,22 @@ export class UserLayoutComponent implements OnInit {
     }
   }
 
+  subscribeToNotifications() {
+    this.notificationsSubscription = this.notificationService.notifications$.subscribe(notifications => {
+      this.notifications = notifications;
+      this.updateNotificationCount();
+    });
+  }
+
   loadNotifications() {
-    // Mock notifications - replace with actual API call
-    this.notifications = [
-      {
-        id: '1',
-        type: 'info',
-        message: 'Your account statement is ready',
-        time: new Date(),
-        read: false
+    this.notificationService.getNotifications().subscribe(
+      () => {
+        // Notifications are updated via the subscription
       },
-      {
-        id: '2',
-        type: 'success',
-        message: 'Transfer completed successfully',
-        time: new Date(Date.now() - 3600000),
-        read: false
+      error => {
+        console.error('Error loading notifications:', error);
       }
-    ];
-    this.updateNotificationCount();
+    );
   }
 
   updateNotificationCount() {
@@ -162,8 +140,26 @@ export class UserLayoutComponent implements OnInit {
 
   toggleSidebar() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
-    this.isMobileMenuOpen = !this.isSidebarCollapsed;
+    // On desktop, toggling sidebar doesn't open mobile menu
+    if (window.innerWidth <= 768) {
+       this.isMobileMenuOpen = !this.isSidebarCollapsed;
+    }
     localStorage.setItem('sidebarState', JSON.stringify(this.isSidebarCollapsed));
+  }
+
+  markAsRead(notification: Notification) {
+    if (!notification.read) {
+      this.notificationService.markAsRead(notification._id).subscribe({
+        next: () => {
+          this.router.navigate(['/user/notifications', notification._id]);
+        },
+        error: error => {
+          console.error('Error marking notification as read:', error);
+        }
+      });
+    } else {
+      this.router.navigate(['/user/notifications', notification._id]);
+    }
   }
 
   checkScreenSize() {
@@ -204,10 +200,14 @@ export class UserLayoutComponent implements OnInit {
   }
 
   markAllRead() {
-    this.notifications.forEach(notification => {
-      notification.read = true;
-    });
-    this.updateNotificationCount();
+    this.notificationService.markAllAsRead().subscribe(
+      () => {
+        // State updated via subscription
+      },
+      error => {
+        console.error('Error marking all notifications as read:', error);
+      }
+    );
   }
 
   async logout() {

@@ -1,8 +1,8 @@
 const RequestCard = require('../models/requestCard');
-const Card = require('../models/card'); // Assuming you have a Card model
-const Account = require('../models/account'); // Assuming you have an Account model
-const User = require('../models/user'); // Assuming you have a User model
-const { requestNewCard } = require('./cardController'); // Import the existing method
+const User = require('../models/user');
+const Account = require('../models/account');
+const { createNotification } = require('./notificationController');
+const { requestNewCard } = require('./cardController');
 
 // @desc    Request a new card
 // @route   POST /api/card-requests
@@ -51,11 +51,11 @@ exports.getPendingCardRequests = async (req, res) => {
 // @route   PUT /api/card-requests/:id
 // @access  Private/Admin
 exports.updateCardRequestStatus = async (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
-
   try {
-    const request = await RequestCard.findById(id);
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const request = await RequestCard.findById(id).populate('user');
 
     if (!request) {
       return res.status(404).json({ message: 'Card request not found' });
@@ -64,20 +64,48 @@ exports.updateCardRequestStatus = async (req, res) => {
     request.status = status;
     await request.save();
 
-    // If approved, call the existing requestNewCard method
+    let notificationMessage = `Your card request for a ${request.cardType} card has been ${status}.`;
+    let notificationType = status === 'approved' ? 'success' : 'info';
+
     if (status === 'approved') {
-      // Fetch account details to get accountNumber and IBAN
-      const account = await Account.findById(request.account);
+      // If approved, call the existing requestNewCard method with skipResponse
+      const account = await Account.findById(request.account).populate('user');
       if (!account) {
         return res.status(404).json({ message: 'Account not found for the card request' });
       }
 
-      // Call requestNewCard with the required parameters
-      await requestNewCard({ body: { accountNumber: account.accountNumber, IBAN: account.IBAN, cardType: request.cardType }, user: { id: request.user } }, res);
+      try {
+        const newCard = await requestNewCard({ 
+          body: { 
+            accountNumber: account.accountNumber, 
+            IBAN: account.IBAN, 
+            cardType: request.cardType 
+          }
+        }, res, true); // Add skipResponse=true parameter
+        
+        // Include the new card information in the response
+        return res.status(200).json({ 
+          message: 'Card request status updated successfully',
+          card: newCard
+        });
+      } catch (error) {
+        return res.status(500).json({ message: error.message });
+      }
+    } else if (status === 'cancelled') {
+      notificationType = 'error';
     }
 
-    res.json(request);
+    // Create notification for non-approved statuses
+    await createNotification(
+      request.user._id,
+      notificationType,
+      notificationMessage
+    );
+
+    res.status(200).json({ message: 'Card request status updated successfully' });
+
   } catch (error) {
+    console.error('Error updating card request status:', error);
     res.status(500).json({ message: error.message });
   }
 };

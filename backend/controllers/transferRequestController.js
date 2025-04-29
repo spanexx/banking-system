@@ -2,6 +2,32 @@ const RequestTransfer = require('../models/requestTransfer');
 const Transaction = require('../models/transaction');
 const ActivityLog = require('../models/activityLog');
 const { createNotification } = require('./notificationController');
+const Account = require('../models/account');
+const nodemailer = require('nodemailer');
+
+
+// Configure mailer
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: process.env.SMTP_SECURE === 'true',
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  },
+  tls: {
+    rejectUnauthorized: false
+  }
+});
+
+// Verify transporter connection
+transporter.verify(function(error, success) {
+  if (error) {
+    console.log('SMTP connection error:', error);
+  } else {
+    console.log('SMTP server is ready');
+  }
+});
 
 // @desc    Create transfer request and send verification code
 // @route   POST /api/transfer-requests

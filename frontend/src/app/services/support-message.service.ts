@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 
 
@@ -19,7 +20,7 @@ export interface SupportMessage {
   providedIn: 'root'
 })
 export class SupportMessageService {
-  private apiUrl = '/api/support'; // Adjust if your API base URL is different
+  private apiUrl = `${environment.apiUrl}/support`; // Adjust if your API base URL is different
 
   constructor(private http: HttpClient) { }
 

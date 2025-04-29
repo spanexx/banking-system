@@ -1,12 +1,12 @@
 {
   "/api": {
-    "target": "http://localhost:5000",
-    "secure": false,
+    "target": "https://banking.spanexx.com",
+    "secure": true,
     "changeOrigin": true
   },
   "/socket.io": {
-    "target": "http://localhost:5000",
-    "secure": false,
+    "target": "https://banking.spanexx.com",
+    "secure": true,
     "ws": true,
     "changeOrigin": true
   }

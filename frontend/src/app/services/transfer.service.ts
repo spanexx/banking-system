@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 interface TransferRequestData {
   fromAccountId: string;
@@ -15,7 +16,7 @@ interface TransferRequestData {
   providedIn: 'root'
 })
 export class TransferService {
-  private apiUrl = '/api/transfer-requests';
+  private apiUrl = `${environment.apiUrl}/transfer-requests`;
 
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');

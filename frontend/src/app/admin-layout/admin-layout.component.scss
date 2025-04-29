@@ -11,8 +11,12 @@
 
 .sidebar {
   @include layout.sidebar-base;
-  transform: none;
-  transition: transform 0.3s ease, width 0.3s ease;
+  
+  & {
+    width: layout.$sidebar-width;
+    transform: none;
+    transition: transform 0.3s ease, width 0.3s ease;
+  }
 
   .sidebar-header {
     @include layout.sidebar-header;
@@ -46,7 +50,6 @@
   &.collapsed:not(.mobile-open) {
     @media (min-width: 769px) {
       width: layout.$sidebar-width-collapsed;
-      overflow-x: hidden; // Add this line to hide horizontal overflow when collapsed
       
       .logo-container {
         justify-content: center;
@@ -55,7 +58,6 @@
           opacity: 0;
           width: 0;
           overflow: hidden;
-          white-space: normal; // Allow wrapping or proper hiding
         }
       }
 
@@ -72,7 +74,6 @@
           opacity: 0;
           width: 0;
           overflow: hidden;
-          white-space: normal; // Allow wrapping or proper hiding
         }
       }
     }
@@ -87,6 +88,7 @@
   @include layout.main-content;
   
   & {
+    flex: 1;
     transition: margin-left 0.3s ease;
   }
 
@@ -95,12 +97,10 @@
     width: 100%;
   }
 
-  // Adjust margin when sidebar is collapsed
-  // &.collapsed {
-  //   // margin-left handled by flexbox
-  // }
-
   .top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 0.75rem 1.25rem;
     background: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -129,14 +129,9 @@
     }
   }
 
-  &:has(.sidebar.collapsed) {
-    @media (min-width: 769px) {
-      // margin-left is handled by flexbox in the parent container
-    }
-  }
-
   .content {
     padding: 2rem;
+    
     @media (max-width: 768px) {
       padding: 1rem;
     }
@@ -149,20 +144,6 @@
 
 .loading-bar {
   @include layout.loading-bar;
-}
-
-// Responsive styles
-@include layout.mobile {
-  .sidebar {
-    position: fixed;
-    z-index: 1000;
-  }
-
-  .main-content {
-    .mobile-menu {
-      display: block;
-    }
-  }
 }
 
 // Menu styles

@@ -1,0 +1,11 @@
+# Run maintenance script daily at 2 AM
+0 2 * * * cd /path/to/banking-system/backend && /usr/bin/node scripts/maintenance.js >> logs/maintenance.log 2>&1
+
+# Backup database every 6 hours
+0 */6 * * * cd /path/to/banking-system/backend && /usr/bin/node -e 'require("./scripts/maintenance.js").backupDatabase()' >> logs/db-backup.log 2>&1
+
+# Clean old uploads weekly on Sunday at 3 AM
+0 3 * * 0 cd /path/to/banking-system/backend && /usr/bin/node -e 'require("./scripts/maintenance.js").cleanUploads()' >> logs/cleanup.log 2>&1
+
+# Rotate logs monthly on the 1st at 1 AM
+0 1 1 * * cd /path/to/banking-system/backend && /usr/bin/node -e 'require("./scripts/maintenance.js").rotateLogs()' >> logs/rotation.log 2>&1

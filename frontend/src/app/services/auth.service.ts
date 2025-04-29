@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = '/api/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
   private isLoggedInSubject = new BehaviorSubject<boolean>(!!localStorage.getItem('token'));
   isLoggedIn$ = this.isLoggedInSubject.asObservable();
 
@@ -13,11 +13,20 @@ export class AuthService {
 
   login(email: string, password: string) {
     return this.http.post<any>(`${this.apiUrl}/login`, { email, password }).pipe(
-      tap(res => {
-        console.log('Login response:', res);
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('user', JSON.stringify(res.user));
-        this.isLoggedInSubject.next(true);
+      tap({
+        next: (res) => {
+          console.log('Login response:', res);
+          localStorage.setItem('token', res.token);
+          localStorage.setItem('user', JSON.stringify(res.user));
+          this.isLoggedInSubject.next(true);
+        },
+        error: (error) => {
+          console.error('Login error:', error);
+          if (error.status === 404) {
+            throw new Error('Backend server is not reachable. Please ensure the server is running and configured correctly.');
+          }
+          throw error;
+        }
       })
     );
   }

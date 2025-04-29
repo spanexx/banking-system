@@ -186,3 +186,57 @@ Key features:
    - Regular security audits
    - Implement rate limiting
    - Set up firewall rules
+
+## Rollback Procedures
+
+If a deployment fails or causes issues, you can use the rollback script to revert to the previous working version:
+
+```bash
+node scripts/rollback.js
+```
+
+The rollback process will:
+1. Stop the current application
+2. Restore the most recent database backup
+3. Switch back to the previous deployment version
+4. Restart the application using PM2
+
+### Manual Rollback Steps
+
+In case the automated rollback fails:
+
+1. **Stop Current Application**
+   ```bash
+   pm2 stop banking-api
+   ```
+
+2. **Restore Database Backup**
+   ```bash
+   # Extract latest backup
+   cd backups
+   tar -xzf db-backup-[timestamp].tar.gz
+   
+   # Restore using mongorestore
+   mongorestore --uri="your_mongodb_uri" --drop ./db-backup-[timestamp]
+   ```
+
+3. **Switch to Previous Version**
+   ```bash
+   cd deployments/deployment-[previous-version]
+   pm2 start ecosystem.config.js --env production
+   pm2 save
+   ```
+
+4. **Verify Recovery**
+   - Check application logs: `pm2 logs banking-api`
+   - Monitor application status: `pm2 monit`
+   - Test critical functionalities
+   - Verify database consistency
+
+### Emergency Contacts
+
+Maintain a list of emergency contacts in case of deployment issues:
+- DevOps Team Lead
+- Database Administrator
+- System Administrator
+- Application Development Lead

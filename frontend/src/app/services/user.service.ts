@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = '/api/users';
+  private apiUrl = `${environment.apiUrl}/users`;
 
   constructor(private http: HttpClient) { }
 
@@ -37,6 +38,7 @@ export class UserService {
     const headers = this.getAuthHeaders();
     return this.http.delete<any>(`${this.apiUrl}/${id}`, { headers });
   }
+
   getUserCountByDateRange(startDate: string, endDate: string): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.get<any>(`${this.apiUrl}/count?startDate=${startDate}&endDate=${endDate}`, { headers });

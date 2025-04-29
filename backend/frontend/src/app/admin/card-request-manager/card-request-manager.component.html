@@ -1,0 +1,86 @@
+<div class="card-requests-container">
+  <div class="page-header">
+    <h2>Card Requests Management</h2>
+    <div class="header-actions">
+      <button mat-icon-button (click)="getPendingRequests()" matTooltip="Refresh">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+    <p class="subtitle">Manage and monitor card requests</p>
+  </div>
+
+  <mat-card class="requests-card">
+    <div class="loading-container" *ngIf="isLoading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div class="error-container" *ngIf="error">
+      <p class="error-message">{{ error }}</p>
+      <button mat-button color="primary" (click)="getPendingRequests()">Retry</button>
+    </div>
+
+    <table mat-table [dataSource]="pendingRequests" class="requests-table" *ngIf="!isLoading && !error">
+      <!-- User Column -->
+      <ng-container matColumnDef="user">
+        <th mat-header-cell *matHeaderCellDef>User</th>
+        <td mat-cell *matCellDef="let request">{{ request.user?.name }}</td>
+      </ng-container>
+
+      <!-- Account Type Column -->
+      <ng-container matColumnDef="accountType">
+        <th mat-header-cell *matHeaderCellDef>Account Type</th>
+        <td mat-cell *matCellDef="let request">{{ request.account?.type }}</td>
+      </ng-container>
+
+      <!-- Card Type Column -->
+      <ng-container matColumnDef="cardType">
+        <th mat-header-cell *matHeaderCellDef>Card Type</th>
+        <td mat-cell *matCellDef="let request">{{ request.cardType }}</td>
+      </ng-container>
+
+      <!-- Request Date Column -->
+      <ng-container matColumnDef="requestDate">
+        <th mat-header-cell *matHeaderCellDef>Request Date</th>
+        <td mat-cell *matCellDef="let request">{{ request.requestDate | date:'medium' }}</td>
+      </ng-container>
+
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let request">
+          <span class="status-badge" [class.pending-status]="request.status === 'pending'">
+            {{ request.status | titlecase }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let request">
+          <button mat-icon-button color="primary" 
+                  (click)="updateRequestStatus(request._id, 'Approved')"
+                  [disabled]="request.status !== 'pending'"
+                  matTooltip="Approve Request">
+            <mat-icon>check_circle</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" 
+                  (click)="updateRequestStatus(request._id, 'Rejected')"
+                  [disabled]="request.status !== 'pending'"
+                  matTooltip="Reject Request">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <!-- No Data Message -->
+    <div class="no-data-message" *ngIf="!isLoading && !error && pendingRequests.length === 0">
+      <mat-icon>info</mat-icon>
+      <p>No pending card requests found</p>
+    </div>
+  </mat-card>
+</div>

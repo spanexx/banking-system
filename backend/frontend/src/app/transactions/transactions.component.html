@@ -1,0 +1,81 @@
+<div class="transactions-container">
+  <div class="transactions-header">
+    <h2>Transaction History</h2>
+    <p>View and manage your transaction history</p>
+  </div>
+
+  <div class="transactions-filters">
+    <mat-form-field>
+      <mat-label>Start Date</mat-label>
+      <input matInput type="date" [(ngModel)]="startDate" name="startDate">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>End Date</mat-label>
+      <input matInput type="date" [(ngModel)]="endDate" name="endDate">
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="applyFilter()">
+      <mat-icon>filter_list</mat-icon>
+      Apply Filter
+    </button>
+
+    <button mat-raised-button (click)="downloadPdf()">
+      <mat-icon>download</mat-icon>
+      Download PDF
+    </button>
+  </div>
+
+  <div class="transactions-table" *ngIf="transactions.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th>Transaction ID</th>
+          <th>Type</th>
+          <th>Amount</th>
+          <th>Date</th>
+          <th>Description</th>
+          <th>From Account</th>
+          <th>To Account</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let txn of transactions">
+          <td>{{ txn.transactionId }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="txn.type">
+              {{ txn.type | titlecase }}
+            </span>
+          </td>
+          <td class="amount" [ngClass]="{
+            'credit': txn.type === 'deposit',
+            'debit': txn.type === 'withdrawal' || txn.type === 'transfer'
+          }">
+            {{ txn.amount | currency }}
+          </td>
+          <td>{{ txn.date | date:'short' }}</td>
+          <td>{{ txn.description }}</td>
+          <td>{{ txn.fromAccount?.accountNumber || '-' }}</td>
+          <td>{{ txn.toAccount?.accountNumber || '-' }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="txn.status.toLowerCase()">
+              {{ txn.status | titlecase }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="no-data" *ngIf="transactions.length === 0">
+    <mat-icon>info</mat-icon>
+    <p>No transactions found for the selected period.</p>
+  </div>
+
+  <div class="pagination">
+    <div class="page-info">
+      Showing {{ transactions.length }} transactions
+    </div>
+  </div>
+</div>

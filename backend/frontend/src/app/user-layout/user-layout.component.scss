@@ -1,0 +1,351 @@
+@use '../shared/styles/layout' as layout;
+
+:host {
+  display: block;
+  height: 100vh;
+}
+
+.layout-container {
+  @include layout.layout-container;
+}
+
+.noti{
+  background-color: whitesmoke
+}
+
+.mobile-menu {
+  @include layout.mobile-menu;
+}
+
+.sidebar {
+  @include layout.sidebar-base;
+  
+  & {
+    transform: none;
+    transition: transform 0.3s ease, width 0.3s ease;
+  }
+
+  .sidebar-header {
+    @include layout.sidebar-header;
+
+    .logo-container {
+      .logo {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        transition: all 0.3s ease;
+      }
+
+      .logo-text {
+        color: #1565c0;
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-left: 0.5rem;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .navigation {
+    @include layout.navigation;
+  }
+
+  .sidebar-footer {
+    @include layout.sidebar-footer;
+  }
+
+  &.collapsed {
+    @media (min-width: 769px) {
+      width: layout.$sidebar-width-collapsed;
+
+      .logo-container {
+        justify-content: center;
+        
+        .logo-text {
+          opacity: 0;
+          width: 0;
+          overflow: hidden;
+        }
+      }
+
+      .nav-item {
+        padding: 0.75rem;
+        justify-content: center;
+
+        fa-icon {
+          margin-right: 0;
+          font-size: 1.2rem;
+        }
+
+        span {
+          opacity: 0;
+          width: 0;
+          overflow: hidden;
+        }
+      }
+    }
+    
+    @media (max-width: 768px) {
+      transform: translateX(-100%);
+    }
+  }
+
+  &.collapsed:not(.mobile-open) {
+    @media (min-width: 769px) {
+      width: layout.$sidebar-width-collapsed;
+      
+      .logo-container {
+        justify-content: center;
+        
+        .logo-text {
+          opacity: 0;
+          width: 0;
+          overflow: hidden;
+        }
+      }
+
+      .nav-item {
+        padding: 0.75rem;
+        justify-content: center;
+
+        fa-icon {
+          margin-right: 0;
+          font-size: 1.2rem;
+        }
+
+        span {
+          opacity: 0;
+          width: 0;
+          overflow: hidden;
+        }
+      }
+    }
+  }
+
+  &.mobile-open {
+    transform: translateX(0);
+  }
+}
+
+.main-content {
+  @include layout.main-content;
+  
+  & {
+    transition: margin-left 0.3s ease;
+  }
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+
+    .mobile-menu {
+      display: none;
+      @media (max-width: 768px) {
+        display: flex;
+        align-items: center;
+        margin-right: 1rem;
+      }
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .notification-bell {
+        position: relative;
+        margin-right: 8px;
+
+        mat-icon {
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+        }
+
+        ::ng-deep .mat-badge-content {
+          font-size: 10px;
+          width: 8px;
+          height: 8px;
+          line-height: 18px;
+          right: -8px !important;
+          top: -8px !important;
+          background-color: #f44336;
+          font-weight: 600;
+          border: 2px solid #fff;
+          border-radius: 50%;
+        }
+
+        &:hover {
+          mat-icon {
+            color: #1565c0;
+          }
+        }
+      }
+    }
+  }
+
+  &:has(.sidebar.collapsed) {
+    @media (min-width: 769px) {
+      margin-left: layout.$sidebar-width-collapsed;
+    }
+  }
+}
+
+// Notification Menu Styles
+::ng-deep .notifications-menu {
+  max-width: 360px !important;
+  padding: 0 !important;
+
+  .menu-header {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+  }
+
+  .notification-list {
+    max-height: 360px;
+    overflow-y: auto;
+
+    .mat-mdc-menu-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      min-height: 64px;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+
+      &.unread {
+        background: rgba(25, 118, 210, 0.04);
+      }
+
+      mat-icon {
+        margin-top: 0.25rem;
+        
+        &.info { 
+          color: #2196f3; 
+        }
+        &.warning { 
+          color: #ff9800; 
+        }
+        &.success { 
+          color: #4caf50; 
+        }
+        &.error { 
+          color: #f44336; 
+        }
+      }
+
+      .notification-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        margin-left: 8px;
+
+        .notification-message {
+          font-size: 0.9rem;
+          line-height: 1.4;
+          color: rgba(0, 0, 0, 0.87);
+        }
+
+        .notification-time {
+          font-size: 0.75rem;
+          color: rgba(0, 0, 0, 0.6);
+        }
+      }
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+    }
+  }
+
+  .menu-footer {
+    padding: 0.75rem;
+    text-align: center;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
+}
+
+// Profile Menu Styles
+::ng-deep .profile-menu {
+  min-width: 200px !important;
+
+  .mat-mdc-menu-item {
+    font-size: 0.9rem;
+
+    mat-icon {
+      margin-right: 0.75rem;
+    }
+  }
+}
+
+// Responsive styles
+@include layout.mobile {
+  .sidebar {
+    position: fixed;
+    z-index: 1000;
+  }
+}
+
+// Mobile Menu Overlay
+.mobile-menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  &.active {
+    display: block;
+    opacity: 1;
+  }
+}
+
+// Menu styles
+::ng-deep {
+  .mat-menu-panel {
+    min-width: 200px !important;
+  }
+
+  .mat-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    fa-icon {
+      color: layout.$text-secondary;
+    }
+
+    &:hover {
+      fa-icon {
+        color: layout.$primary-color;
+      }
+    }
+  }
+}

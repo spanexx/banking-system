@@ -1,0 +1,59 @@
+<div class="card-transaction-form">
+  <div *ngIf="successMessage" class="success-message">
+    <mat-icon>check_circle</mat-icon>
+    {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="error-message">
+    <mat-icon>error</mat-icon>
+    {{ errorMessage }}
+  </div>
+
+  <form (ngSubmit)="createCardTransaction()">
+    <div class="form-row">
+      <mat-form-field>
+        <mat-label>Card Number</mat-label>
+        <input matInput [(ngModel)]="cardTransaction.cardNumber" name="cardNumber" required pattern="[0-9]{16}" placeholder="Enter 16-digit card number">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Expiry Date</mat-label>
+        <input matInput [(ngModel)]="cardTransaction.expiryDate" name="expiryDate" required pattern="(0[1-9]|1[0-2])\/[0-9]{2}" placeholder="MM/YY">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>CVV</mat-label>
+        <input matInput [(ngModel)]="cardTransaction.cvv" name="cvv" required pattern="[0-9]{3,4}" placeholder="Enter CVV">
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field>
+        <mat-label>Transaction Type</mat-label>
+        <mat-select [(ngModel)]="cardTransaction.transactionType" name="transactionType" required>
+          <mat-option value="purchase">Purchase</mat-option>
+          <mat-option value="withdrawal">Withdrawal</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Amount</mat-label>
+        <input matInput type="number" [(ngModel)]="cardTransaction.amount" name="amount" required min="0.01" step="0.01">
+        <span matPrefix>$&nbsp;</span>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field>
+        <mat-label>Merchant Details</mat-label>
+        <textarea matInput [(ngModel)]="cardTransaction.merchantDetails" name="merchantDetails" required rows="2" placeholder="Enter merchant or transaction details"></textarea>
+      </mat-form-field>
+    </div>
+
+    <div class="form-actions">
+      <button mat-raised-button color="primary" type="submit" [disabled]="!isFormValid()">
+        <mat-icon>credit_card</mat-icon>
+        Process Card Transaction
+      </button>
+    </div>
+  </form>
+</div>

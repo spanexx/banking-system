@@ -1,0 +1,7 @@
+<h2 mat-dialog-title>Image Preview</h2>
+<mat-dialog-content>
+  <img [src]="data.imageUrl" alt="Preview" style="max-width: 100%; height: auto;">
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onClose()">Close</button>
+</mat-dialog-actions>

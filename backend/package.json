@@ -22,6 +22,7 @@
     "crypto": "^1.0.1",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "express-fileupload": "^1.5.1",
     "express-rate-limit": "^7.1.5",
     "helmet": "^7.2.0",
     "jsonwebtoken": "^9.0.2",

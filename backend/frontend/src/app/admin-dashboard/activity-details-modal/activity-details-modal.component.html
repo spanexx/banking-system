@@ -1,0 +1,15 @@
+<h2 mat-dialog-title>Activity Details</h2>
+<mat-dialog-content>
+  <p><strong>Action:</strong> {{ activity.action }}</p>
+  <p><strong>Date:</strong> {{ activity.date | date:'medium' }}</p>
+  <p><strong>User ID:</strong> {{ activity.user }}</p>
+  <div *ngIf="activity.metadata">
+    <p><strong>Metadata:</strong></p>
+    <div *ngFor="let key of objectKeys(activity.metadata)">
+      <p><strong>{{ key }}:</strong> {{ activity.metadata[key] }}</p>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onClose()">Close</button>
+</mat-dialog-actions>

@@ -1,0 +1,101 @@
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1>Welcome to Simpli<br>Banking Made Simple</h1>
+      <p>Experience seamless digital banking with state-of-the-art security and innovative features designed for your financial success.</p>
+      <div class="cta-buttons">
+        <button mat-flat-button class="primary" (click)="navigateToStart()">
+          <mat-icon>{{ isLoggedIn ? 'dashboard' : 'arrow_forward' }}</mat-icon>
+          {{ isLoggedIn ? 'Dashboard' : 'Get Started' }}
+        </button>
+        <button mat-stroked-button class="secondary" routerLink="/products">Learn More</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="section-header">
+      <h2>Why Simpli?</h2>
+      <p>Discover the features that make us your ideal banking partner</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="icon-container">
+          <mat-icon>security</mat-icon>
+        </div>
+        <h3>Secure Banking</h3>
+        <p>Bank with confidence knowing your money is protected by state-of-the-art security systems.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="icon-container">
+          <mat-icon>speed</mat-icon>
+        </div>
+        <h3>Fast Transfers</h3>
+        <p>Send and receive money instantly with our lightning-fast transfer system.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="icon-container">
+          <mat-icon>devices</mat-icon>
+        </div>
+        <h3>Digital First</h3>
+        <p>Access your accounts anytime, anywhere with our mobile-friendly platform.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose Us Section -->
+  <section class="why-us-section">
+    <div class="content-wrapper">
+      <div class="text-content">
+        <h2>The SimpliBank Advantage</h2>
+        <div class="benefits-list">
+          <div class="benefit-item">
+            <mat-icon>check_circle</mat-icon>
+            <div class="benefit-text">
+              <h4>24/7 Support</h4>
+              <p>Our dedicated support team is always ready to assist you with any banking needs.</p>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <mat-icon>check_circle</mat-icon>
+            <div class="benefit-text">
+              <h4>No Hidden Fees</h4>
+              <p>Transparent pricing with no surprises. Know exactly what you're paying for.</p>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <mat-icon>check_circle</mat-icon>
+            <div class="benefit-text">
+              <h4>Smart Banking Tools</h4>
+              <p>Advanced features to help you manage and grow your money effectively.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="image-content">
+        <img src="/images/mobile.png" alt="Why Choose Us" class="responsive-image">
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+
+
+  <!-- Open Account Section -->
+  <section class="cta-section">
+    <h2>Ready to get started?</h2>
+    <p>Open your account today and experience modern banking at its finest</p>
+    <button mat-raised-button color="primary" routerLink="/open-account">
+      <mat-icon>account_balance</mat-icon>
+      Open an Account
+    </button>
+  </section>
+</div>

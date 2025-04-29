@@ -1,0 +1,232 @@
+.support-messages-container {
+  padding: 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .search-field {
+        width: 300px;
+      }
+    }
+  }
+
+  .messages-content {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    .error-message {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px;
+      border-radius: 4px;
+      background-color: #fdecea;
+      color: #d32f2f;
+
+      mat-icon {
+        font-size: 24px;
+        height: 24px;
+        width: 24px;
+      }
+    }
+
+    mat-card {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+
+      .messages-table {
+        width: 100%;
+
+        .mat-mdc-row {
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+          }
+
+          &.selected-row {
+            background-color: rgba(0, 0, 0, 0.08);
+          }
+        }
+
+        .mat-mdc-cell {
+          padding: 12px 8px;
+        }
+
+        mat-chip-set {
+          .mat-mdc-chip {
+            &.open {
+              background-color: #ff9800;
+              color: white;
+            }
+            &.in-progress {
+              background-color: #2196f3;
+              color: white;
+            }
+            &.closed {
+              background-color: #4caf50;
+              color: white;
+            }
+          }
+        }
+
+        .mat-column-select {
+          width: 48px;
+          padding-left: 12px;
+        }
+
+        .mat-column-actions {
+          width: 160px;
+          text-align: right;
+        }
+      }
+    }
+  }
+}
+
+// Message Details Dialog Styles
+.message-details {
+  padding: 0 16px;
+
+  .message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+
+    .sender-info {
+      h3 {
+        margin: 0 0 4px;
+        font-size: 18px;
+        font-weight: 500;
+      }
+
+      p {
+        margin: 0;
+        color: rgba(0, 0, 0, 0.6);
+      }
+    }
+
+    .message-meta {
+      text-align: right;
+
+      .timestamp {
+        margin: 0 0 8px;
+        color: rgba(0, 0, 0, 0.6);
+        font-size: 14px;
+      }
+    }
+  }
+
+  .message-subject,
+  .message-content {
+    margin-bottom: 24px;
+
+    h4 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.87);
+    }
+
+    p {
+      margin: 0;
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+  }
+
+  .account-request-details {
+    background-color: #f5f5f5;
+    padding: 16px;
+    border-radius: 8px;
+    margin-top: 24px;
+
+    h4 {
+      margin: 0 0 16px;
+      font-size: 16px;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.87);
+    }
+
+    .metadata-grid {
+      display: grid;
+      gap: 16px;
+
+      .metadata-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .label {
+          font-size: 14px;
+          color: rgba(0, 0, 0, 0.6);
+        }
+
+        .value {
+          font-size: 15px;
+          color: rgba(0, 0, 0, 0.87);
+        }
+
+        .id-preview {
+          margin-top: 8px;
+          
+          img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Global styles for error snackbar
+::ng-deep .error-snackbar {
+  background-color: #d32f2f;
+  color: white;
+}
+
+// Status chip colors in table and dialog
+::ng-deep {
+  .mat-mdc-chip {
+    &.open {
+      background-color: #ff9800 !important;
+      color: white !important;
+    }
+    &.in-progress {
+      background-color: #2196f3 !important;
+      color: white !important;
+    }
+    &.closed {
+      background-color: #4caf50 !important;
+      color: white !important;
+    }
+  }
+}

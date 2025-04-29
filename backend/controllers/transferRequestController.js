@@ -156,22 +156,24 @@ exports.createRequest = async (req, res) => {
 // @route   POST /api/transfer-requests/verify
 // @access  Private
 exports.verifyTransferRequest = async (req, res) => {
-  const { code } = req.body;
-  const transfer = await RequestTransfer.findOne({ 
-    requestedBy: req.user._id, 
-    status: 'pending',
-    verificationCodeExpiry: { $gt: new Date() }
-  });
-
-  if (!transfer) {
-    return res.status(404).json({ message: 'No pending transfer request found or verification code expired' });
-  }
-  
-  if (transfer.code !== code) {
-    return res.status(400).json({ message: 'Invalid verification code' });
-  }
-
   try {
+    const { requestId, code } = req.body;
+
+    const transfer = await RequestTransfer.findOne({ 
+      _id: requestId,
+      requestedBy: req.user._id, 
+      status: 'pending',
+      codeExpires: { $gt: new Date() }
+    });
+
+    if (!transfer) {
+      return res.status(404).json({ message: 'No pending transfer request found or verification code expired' });
+    }
+    
+    if (transfer.code !== code) {
+      return res.status(400).json({ message: 'Invalid verification code' });
+    }
+
     // Execute the transaction using the static method
     const transaction = await Transaction.createTransaction({
       accountId: transfer.fromAccount,
@@ -191,20 +193,21 @@ exports.verifyTransferRequest = async (req, res) => {
     transfer.status = 'approved';
     await transfer.save();
 
-    // Create a notification using the centralized function
+    // Create a success notification
     await createNotification(
       req.user._id,
       'success',
-      `Your transfer request to ${transfer.toAccount} for ${transfer.amount} has been approved.`
+      `Your transfer of ${transfer.amount} to ${transfer.toAccount} has been completed successfully.`
     );
 
+    // Log the activity
     await ActivityLog.create({
       user: req.user._id,
       action: 'Verified Transfer',
       metadata: { 
         transferRequest: transfer._id,
         transaction: transaction._id,
-        isInternational: transaction._doc?.message ? true : false,
+        isInternational: !!transaction._doc?.message,
         bankName: transfer.bankName,
         receiverName: transfer.accountHolderName
       }
@@ -217,17 +220,13 @@ exports.verifyTransferRequest = async (req, res) => {
     });
 
   } catch (error) {
-    transfer.status = 'failed';
-    await transfer.save();
-
-    // Create a failure notification using the centralized function
-    await createNotification(
-      req.user._id,
-      'error',
-      `Your transfer request to ${transfer.toAccount} for ${transfer.amount} has failed.`
-    );
-
-    res.status(400).json({ message: error.message });
+    console.error('Error verifying transfer:', error);
+    
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: error.message });
+    }
+    
+    res.status(500).json({ message: 'Error processing transfer', error: error.message });
   }
 };
 

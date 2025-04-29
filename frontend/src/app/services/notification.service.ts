@@ -23,7 +23,7 @@ export class NotificationService {
   private socket: any;
 
   constructor(private http: HttpClient) {
-    this.socket = io(environment.apiUrl);
+    this.socket = io(environment.wsUrl);
     this.setupSocketListeners();
   }
 

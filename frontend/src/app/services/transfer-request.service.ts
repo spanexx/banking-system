@@ -24,9 +24,9 @@ export class TransferRequestService {
     return this.http.post(`${this.apiUrl}`, requestData, { headers });
   }
 
-  verifyTransferRequest(verificationData: any): Observable<any> {
+  verifyTransferRequest(requestId: string, code: string): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.post(`${this.apiUrl}/verify`, verificationData, { headers });
+    return this.http.post(`${this.apiUrl}/verify`, { requestId, code }, { headers });
   }
 
   getTransferRequests(): Observable<any[]> {
@@ -34,10 +34,9 @@ export class TransferRequestService {
     return this.http.get<any[]>(`${this.apiUrl}`, { headers });
   }
 
-  manageTransferRequest(id: string, status: 'approved' | 'rejected'): Observable<any> {
+  manageTransferRequest(id: string, status: string): Observable<any> {
     const headers = this.getAuthHeaders();
-    // Send status in the correct format
-    return this.http.put(`${this.apiUrl}/${id}/manage`, { status: status }, { headers });
+    return this.http.put(`${this.apiUrl}/${id}/manage`, { status }, { headers });
   }
 
   deleteTransferRequest(id: string): Observable<any> {

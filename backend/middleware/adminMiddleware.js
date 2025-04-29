@@ -1,5 +1,8 @@
 const admin = (req, res, next) => {
-  // Assuming user information is attached to req.user by a preceding auth middleware
+  if (!req.user) {
+    return res.status(401).json({ message: 'Authentication required' });
+  }
+  
   if (req.user && req.user.role === 'admin') {
     next();
   } else {

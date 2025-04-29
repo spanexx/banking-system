@@ -27,20 +27,29 @@ const User = require('./models/user');
 const app = express();
 const server = http.createServer(app);
 
-// Security middleware
-app.use(helmet());
-app.use(compression());
-
 // CORS configuration
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? process.env.ALLOWED_ORIGINS?.split(',') 
-    : ["http://localhost:4200"],
+    : ["http://localhost:4200", "https://banking.spanexx.com"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
-  allowedHeaders: ["Authorization", "Content-Type"]
+  allowedHeaders: ["Authorization", "Content-Type", "Origin", "Accept"],
+  exposedHeaders: ["Content-Length", "X-Requested-With"],
+  optionsSuccessStatus: 200,
+  preflightContinue: false,
+  maxAge: 86400 // 24 hours
 };
+
+// Apply CORS middleware before other middleware
 app.use(cors(corsOptions));
+
+// Apply other middleware
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginOpenerPolicy: { policy: "same-origin" }
+}));
+app.use(compression());
 
 // Rate limiting
 const limiter = rateLimit({
@@ -53,33 +62,41 @@ app.use('/api/', limiter);
 // Socket.IO setup with security
 const io = new Server(server, {
   cors: corsOptions,
-  connectionStateRecovery: {
-    maxDisconnectionDuration: 2 * 60 * 1000, // 2 minutes
-    skipMiddlewares: true,
-  },
+  path: '/socket.io',
+  serveClient: false,
   pingTimeout: 60000,
-  pingInterval: 25000
+  pingInterval: 25000,
+  transports: ['websocket', 'polling'],
+  connectionStateRecovery: {
+    maxDisconnectionDuration: 2 * 60 * 1000,
+    skipMiddlewares: true,
+  }
 });
 
-// Make app globally accessible for Socket.IO
-global.app = app;
+// Create notifications namespace
+const notificationsNamespace = io.of('/notifications');
 
-// WebSocket connection handling
-io.on('connection', (socket) => {
-  console.log('Client connected');
+// WebSocket connection handling for notifications
+notificationsNamespace.on('connection', (socket) => {
+  console.log('Client connected to notifications namespace');
   
   socket.on('authenticate', (userId) => {
     if (userId) {
       socket.join(`user_${userId}`);
-      console.log(`User ${userId} authenticated and joined their room`);
+      console.log(`User ${userId} authenticated and joined room`);
     }
   });
 
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
+  socket.on('error', (error) => {
+    console.error('Socket error:', error);
+  });
+
+  socket.on('disconnect', (reason) => {
+    console.log('Client disconnected, reason:', reason);
   });
 });
 
+// Make io instance accessible to the rest of the app
 app.set('io', io);
 
 // Body parser configuration

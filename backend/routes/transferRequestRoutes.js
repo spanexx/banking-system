@@ -4,18 +4,15 @@ const { createRequest, verifyTransferRequest, getTransferRequests, manageTransfe
 const { protect } = require('../middleware/authMiddleware');
 const {admin} = require('../middleware/adminMiddleware');
 
-
-
-
 router.use(protect); // Protect all routes below this middleware
 
 router.post('/', createRequest);
-router.post('/verify', verifyTransferRequest);
+router.post('/verify', verifyTransferRequest); // Verification endpoint
+router.get('/verify/:requestId', verifyTransferRequest); // GET endpoint for verification
 
 // Admin routes - apply adminProtect middleware
-router.put('/:id/manage', admin, manageTransferRequest); // Route for managing transfer requests (approve/reject)
-router.delete('/:id', admin, deleteTransferRequest); // Route for deleting transfer requests
-router.get('/', admin, getTransferRequests); // Route for getting transfer requests
-
+router.put('/:id/manage', admin, manageTransferRequest);
+router.delete('/:id', admin, deleteTransferRequest);
+router.get('/', admin, getTransferRequests);
 
 module.exports = router;

@@ -101,7 +101,13 @@ app.set('io', io);
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
-// Routes
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Serve static files from Angular app's dist directory
+app.use(express.static(path.join(__dirname, '../frontend/dist/frontend')));
+
+// API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/accounts', accountRoutes);
@@ -113,19 +119,9 @@ app.use('/api/cards', cardRoutes);
 app.use('/api/card-requests', requestCardRoutes);
 app.use('/api/notifications', notificationRoutes);
 
-// Serve static files from the 'uploads' directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Serve static files from Angular app's dist directory
-app.use(express.static(path.join(__dirname, '../frontend/dist/frontend')));
-
-// Handle client-side routing - must be after API routes
-app.get('*', (req, res, next) => {
-  // Skip API routes
-  if (req.url.startsWith('/api/')) {
-    return next();
-  }
-  // Serve index.html for all other routes to let Angular handle routing
+// Handle client-side routing - must be last
+app.get('/*', (req, res) => {
+  // Serve index.html for all non-API routes to let Angular handle routing
   res.sendFile(path.join(__dirname, '../frontend/dist/frontend/index.html'));
 });
 

@@ -119,19 +119,56 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: 'Something broke!' });
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({
+    status: 'error',
+    message: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message,
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
+  });
 });
 
-// Handle client-side routing - must be after API routes and before error handlers
-app.get('*', (req, res) => {
-  // Don't redirect API calls
-  if (!req.url.startsWith('/api/')) {
-    res.sendFile(path.join(__dirname, 'frontend/dist/frontend/browser/index.html'));
+// Database connection with retry mechanism
+const connectWithRetry = async () => {
+  const maxRetries = 5;
+  let retries = 0;
+
+  while (retries < maxRetries) {
+    try {
+      await mongoose.connect(process.env.MONGO_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        serverSelectionTimeoutMS: 5000,
+      });
+      console.log('MongoDB connected successfully');
+      
+      // Check/create admin user after successful connection
+      const adminUser = await User.findOne({ role: 'admin' });
+      if (!adminUser && process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
+        await User.create({
+          name: 'Super Admin',
+          email: process.env.ADMIN_EMAIL,
+          password: process.env.ADMIN_PASSWORD,
+          role: 'admin'
+        });
+        console.log('Admin user created successfully');
+      }
+      
+      break;
+    } catch (error) {
+      retries += 1;
+      console.error(`MongoDB connection attempt ${retries} failed:`, error.message);
+      if (retries === maxRetries) {
+        console.error('Max retries reached. Could not connect to MongoDB');
+        process.exit(1);
+      }
+      // Wait for 5 seconds before retrying
+      await new Promise(resolve => setTimeout(resolve, 5000));
+    }
   }
-});
+};
 
 // Start server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 connectWithRetry().then(() => {
   server.listen(PORT, () => {
     console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);

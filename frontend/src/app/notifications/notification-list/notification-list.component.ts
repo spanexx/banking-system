@@ -71,7 +71,7 @@ export class NotificationListComponent implements OnInit {
 
   markAsRead(notification: Notification): void {
     if (!notification.read) {
-      this.notificationService.markAsRead(notification.userId).subscribe({
+      this.notificationService.markAsRead(notification._id).subscribe({
         next: () => {
           this.showSuccess('Notification marked as read');
           this.loadNotifications(); // Reload to get updated list

@@ -61,7 +61,10 @@ export class NotificationDetailComponent implements OnInit {
 
   markAsRead(notification: Notification): void {
     if (!notification.read) {
-      this.notificationService.markAsRead(notification.userId).subscribe({
+      this.notificationService.markAsRead(notification._id).subscribe({
+        next: () => {
+          notification.read = true;
+        },
         error: (error) => {
           this.showError('Error marking notification as read: ' + error.message);
         }

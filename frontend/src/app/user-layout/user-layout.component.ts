@@ -77,6 +77,9 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
 
   isMobileMenuOpen = false;
   isLoading = false;
+  touchStartX: number = 0;
+  touchEndX: number = 0;
+  swipeThreshold = 50; // minimum distance for swipe
 
   constructor(
     private router: Router,
@@ -84,7 +87,7 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
     private authService: AuthService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     // Get current user ID and connect to WebSocket
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
@@ -96,9 +99,52 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
     this.subscribeToNotifications();
     this.loadUserProfile();
     this.checkScreenSize();
+    this.initSwipeDetection();
   }
 
-  ngOnDestroy() {
+  private initSwipeDetection(): void {
+    document.addEventListener('touchstart', (e) => {
+      this.touchStartX = e.touches[0].clientX;
+    }, false);
+
+    document.addEventListener('touchend', (e) => {
+      this.touchEndX = e.changedTouches[0].clientX;
+      this.handleSwipe();
+    }, false);
+  }
+
+  handleSwipe(): void {
+    const swipeDistance = this.touchEndX - this.touchStartX;
+    
+    // Close sidebar on swipe left
+    if (swipeDistance < -this.swipeThreshold && !this.isSidebarCollapsed) {
+      this.closeSidebar();
+    }
+    // Open sidebar on swipe right when near the edge
+    else if (swipeDistance > this.swipeThreshold && this.isSidebarCollapsed && this.touchStartX < 50) {
+      this.openSidebar();
+    }
+  }
+
+  handleNavigation(): void {
+    if (window.innerWidth <= 768) {
+      this.closeSidebar();
+    }
+  }
+
+  private closeSidebar(): void {
+    this.isSidebarCollapsed = true;
+    this.isMobileMenuOpen = false;
+    localStorage.setItem('sidebarState', JSON.stringify(true));
+  }
+
+  private openSidebar(): void {
+    this.isSidebarCollapsed = false;
+    this.isMobileMenuOpen = true;
+    localStorage.setItem('sidebarState', JSON.stringify(false));
+  }
+
+  ngOnDestroy(): void {
     // Clean up WebSocket connection and subscriptions
     this.notificationService.disconnect();
     if (this.notificationsSubscription) {

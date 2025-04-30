@@ -1,7 +1,9 @@
 <!-- Loading Bar -->
 <div class="loading-bar" [class.loading]="isLoading"></div>
 
-<div class="layout-container">
+<div class="layout-container" 
+  (touchstart)="touchStartX = $event.touches[0].clientX" 
+  (touchend)="touchEndX = $event.changedTouches[0].clientX; handleSwipe()">
   <!-- Mobile Menu Overlay -->
   <div class="mobile-menu-overlay" [class.active]="isMobileMenuOpen" (click)="toggleSidebar()"></div>
 
@@ -18,32 +20,32 @@
     </div>
 
     <nav class="navigation">
-      <a mat-button class="nav-item" routerLink="/user/dashboard" routerLinkActive="active">
+      <a mat-button class="nav-item" routerLink="/user/dashboard" routerLinkActive="active" (click)="handleNavigation()">
         <fa-icon [icon]="dashboardIcon"></fa-icon>
         <span *ngIf="!isSidebarCollapsed">Dashboard</span>
       </a>
 
-      <a mat-button class="nav-item" routerLink="/user/transfers" routerLinkActive="active">
+      <a mat-button class="nav-item" routerLink="/user/transfers" routerLinkActive="active" (click)="handleNavigation()">
         <fa-icon [icon]="transfersIcon"></fa-icon>
         <span *ngIf="!isSidebarCollapsed">Transfers</span>
       </a>
 
-      <a mat-button class="nav-item" routerLink="/user/transactions" routerLinkActive="active">
+      <a mat-button class="nav-item" routerLink="/user/transactions" routerLinkActive="active" (click)="handleNavigation()">
         <fa-icon [icon]="transactionsIcon"></fa-icon>
         <span *ngIf="!isSidebarCollapsed">Transactions</span>
       </a>
 
-      <a mat-button class="nav-item" routerLink="/user/cards" routerLinkActive="active">
+      <a mat-button class="nav-item" routerLink="/user/cards" routerLinkActive="active" (click)="handleNavigation()">
         <fa-icon [icon]="cardsIcon"></fa-icon>
         <span *ngIf="!isSidebarCollapsed">Cards</span>
       </a>
 
-      <a mat-button class="nav-item" routerLink="/user/products" routerLinkActive="active">
+      <a mat-button class="nav-item" routerLink="/user/products" routerLinkActive="active" (click)="handleNavigation()">
         <fa-icon [icon]="productsIcon"></fa-icon>
         <span *ngIf="!isSidebarCollapsed">Products</span>
       </a>
 
-      <a mat-button class="nav-item" routerLink="/user/support" routerLinkActive="active">
+      <a mat-button class="nav-item" routerLink="/user/support" routerLinkActive="active" (click)="handleNavigation()">
         <fa-icon [icon]="supportIcon"></fa-icon>
         <span *ngIf="!isSidebarCollapsed">Support</span>
       </a>

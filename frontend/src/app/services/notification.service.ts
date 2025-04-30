@@ -45,16 +45,16 @@ export class NotificationService {
   }
 
   getNotifications(): Observable<Notification[]> {
-    return this.http.get<Notification[]>('/api/notifications').pipe(
+    return this.http.get<Notification[]>(`${environment.apiUrl}/notifications`).pipe(
       tap(notifications => this.notificationsSubject.next(notifications))
     );
   }
 
   markAsRead(id: string): Observable<Notification> {
-    return this.http.put<Notification>(`/api/notifications/${id}/read`, {}).pipe(
+    return this.http.put<Notification>(`${environment.apiUrl}/notifications/${id}/read`, {}).pipe(
       tap(updatedNotification => {
         const currentNotifications = this.notificationsSubject.value;
-        const index = currentNotifications.findIndex(n => n.userId === updatedNotification.userId);
+        const index = currentNotifications.findIndex(n => n._id === updatedNotification._id);
         if (index !== -1) {
           currentNotifications[index] = updatedNotification;
           this.notificationsSubject.next([...currentNotifications]);
@@ -64,7 +64,7 @@ export class NotificationService {
   }
 
   markAllAsRead(): Observable<any> {
-    return this.http.put<any>('/api/notifications/mark-all-read', {}).pipe(
+    return this.http.put<any>(`${environment.apiUrl}/notifications/mark-all-read`, {}).pipe(
       tap(() => {
         const currentNotifications = this.notificationsSubject.value;
         currentNotifications.forEach(n => n.read = true);
@@ -74,20 +74,20 @@ export class NotificationService {
   }
 
   getNotificationById(id: string): Observable<Notification> {
-    return this.http.get<Notification>(`/api/notifications/${id}`);
+    return this.http.get<Notification>(`${environment.apiUrl}/notifications/${id}`);
   }
 
   getNotificationsByUserId(userId: string): Observable<Notification[]> {
-    return this.http.get<Notification[]>(`/api/notifications/user/${userId}`);
+    return this.http.get<Notification[]>(`${environment.apiUrl}/notifications/user/${userId}`);
   }
 
   deleteNotification(id: string): Observable<any> {
-    return this.http.delete(`/api/notifications/${id}`).pipe(
+    return this.http.delete<any>(`${environment.apiUrl}/notifications/${id}`).pipe(
       tap(() => {
         const currentNotifications = this.notificationsSubject.value;
         const updatedNotifications = currentNotifications.filter(n => n._id !== id);
         this.notificationsSubject.next(updatedNotifications);
       })
-    );
+      );
   }
 }

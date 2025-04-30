@@ -101,12 +101,7 @@ app.set('io', io);
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
-// Serve static files from the 'uploads' directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-
-
-// API routes
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/accounts', accountRoutes);
@@ -118,15 +113,20 @@ app.use('/api/cards', cardRoutes);
 app.use('/api/card-requests', requestCardRoutes);
 app.use('/api/notifications', notificationRoutes);
 
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Global error handler
-// Modify the catch-all route to handle 404s for API routes only
-app.all('/api/*', (req, res) => {
-  res.status(404).json({
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({
     status: 'error',
-    message: 'API endpoint not found'
+    message: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message,
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
   });
 });
+
 
 // Database connection with retry mechanism
 const connectWithRetry = async () => {

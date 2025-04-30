@@ -118,11 +118,6 @@ app.use('/api/cards', cardRoutes);
 app.use('/api/card-requests', requestCardRoutes);
 app.use('/api/notifications', notificationRoutes);
 
-// Handle client-side routing - must be last
-app.get('/*', (req, res) => {
-  // Serve index.html for all non-API routes to let Angular handle routing
-  res.sendFile(path.join(__dirname, '../frontend/dist/frontend/index.html'));
-});
 
 // Global error handler
 // Modify the catch-all route to handle 404s for API routes only

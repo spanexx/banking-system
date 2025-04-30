@@ -113,8 +113,13 @@ app.use('/api/cards', cardRoutes);
 app.use('/api/card-requests', requestCardRoutes);
 app.use('/api/notifications', notificationRoutes);
 
-// Serve static files from the 'uploads' directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve static files from the Angular app's build directory
+app.use(express.static(path.join(__dirname, '../frontend/dist/frontend')));
+
+// Fallback route - Send index.html for any unmatched routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/frontend/index.html'));
+});
 
 // Global error handler
 app.use((err, req, res, next) => {

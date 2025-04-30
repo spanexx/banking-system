@@ -104,8 +104,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 // Serve static files from the 'uploads' directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Serve static files from Angular app's dist directory
-app.use(express.static(path.join(__dirname, '../frontend')));
+
 
 // API routes
 app.use('/api/auth', authRoutes);
@@ -126,13 +125,11 @@ app.get('/*', (req, res) => {
 });
 
 // Global error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  const statusCode = err.statusCode || 500;
-  res.status(statusCode).json({
+// Modify the catch-all route to handle 404s for API routes only
+app.all('/api/*', (req, res) => {
+  res.status(404).json({
     status: 'error',
-    message: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message,
-    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
+    message: 'API endpoint not found'
   });
 });
 

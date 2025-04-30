@@ -29,9 +29,7 @@ const server = http.createServer(app);
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.ALLOWED_ORIGINS?.split(',') 
-    : ["http://localhost:4200", "https://banking.spanexx.com"],
+  origin: ["https://banking.spanexx.com", "http://localhost:4200", "https://banking-api-cdtx.onrender.com"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
   allowedHeaders: ["Authorization", "Content-Type", "Origin", "Accept"],

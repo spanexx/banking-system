@@ -163,7 +163,7 @@ export class TransactionsComponent implements OnInit {
       ctx?.drawImage(img, 0, 0);
       this.logoBase64 = canvas.toDataURL('images/logo.png');
     };
-    img.src = ' /images/logo.png';
+    img.src = ' images/logo.png';
   }
 
   applyFilter() {

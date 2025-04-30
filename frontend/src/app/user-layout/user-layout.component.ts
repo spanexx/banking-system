@@ -54,7 +54,7 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
   notifications: Notification[] = [];
   userName: string = '';
   private notificationsSubscription: Subscription | undefined;
-  userAvatar: string = 'assets/images/default-avatar.png';
+  userAvatar: string = 'images/default-avatar.png';
   userProfileIcon = faUser;
   bankLogo = faUniversity;
   logoutIcon = faRightFromBracket;

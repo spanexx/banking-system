@@ -27,6 +27,9 @@ const User = require('./models/user');
 const app = express();
 const server = http.createServer(app);
 
+// Trust proxy - Add this before any middleware
+app.set('trust proxy', 1);
+
 // CORS configuration
 const corsOptions = {
   origin: ["https://banking.spanexx.com", "http://localhost:4200", "https://banking-api-cdtx.onrender.com"],
@@ -39,6 +42,16 @@ const corsOptions = {
   maxAge: 86400 // 24 hours
 };
 
+// Rate limiting with proxy configuration
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  trustProxy: true // Trust the X-Forwarded-For header
+});
+
 // Apply CORS middleware before other middleware
 app.use(cors(corsOptions));
 
@@ -48,14 +61,6 @@ app.use(helmet({
   crossOriginOpenerPolicy: { policy: "same-origin" }
 }));
 app.use(compression());
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
-});
-app.use('/api/', limiter);
 
 // Socket.IO setup with security
 const io = new Server(server, {

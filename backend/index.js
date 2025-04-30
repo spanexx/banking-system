@@ -105,7 +105,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Serve static files from Angular app's dist directory
-app.use(express.static(path.join(__dirname, '../frontend/dist/frontend')));
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 // API routes
 app.use('/api/auth', authRoutes);

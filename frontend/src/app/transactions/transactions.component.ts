@@ -14,6 +14,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { DomSanitizer } from '@angular/platform-browser';
 import { forkJoin, of, mergeMap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 interface CardTransaction {
   transactionId: string;
@@ -49,6 +50,8 @@ export class TransactionsComponent implements OnInit {
   endDate: string = '';
   loading: boolean = false;
   accountId: string | null = null;
+  imageBaseUrl = environment.imageBaseUrl;
+  
   private logoBase64: string = '';
 
   constructor(
@@ -163,7 +166,7 @@ export class TransactionsComponent implements OnInit {
       ctx?.drawImage(img, 0, 0);
       this.logoBase64 = canvas.toDataURL('images/logo.png');
     };
-    img.src = ' images/logo.png';
+    img.src = this.imageBaseUrl + 'logo.png';
   }
 
   applyFilter() {

@@ -8,6 +8,8 @@ import { MatInputModule } from "@angular/material/input";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../environments/environment';
+
 
 @Component({
   selector: 'app-login',
@@ -27,6 +29,8 @@ import { CommonModule } from '@angular/common';
 export class LoginComponent {
   hidePassword = true;
   loginForm: FormGroup;
+  imageBaseUrl = environment.imageBaseUrl;
+
 
   constructor(
     private fb: FormBuilder,

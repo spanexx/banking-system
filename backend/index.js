@@ -23,6 +23,7 @@ const requestCardRoutes = require('./routes/requestCardRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 
 const User = require('./models/user');
+const { admin } = require('./middleware/adminMiddleware');
 
 const app = express();
 const server = http.createServer(app);
@@ -105,6 +106,141 @@ app.set('io', io);
 // Body parser configuration
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+
+// API Info endpoint
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Banking System API',
+    frontendUrl: 'https://banking.spanexx.com',
+    adminUrl: 'https://spanexx.com',
+    version: '1.0.0',
+    description: 'A comprehensive banking system API with real-time notifications',
+    status: 'online',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    endpoints: {
+      authentication: {
+        base: '/api/auth',
+        routes: [
+          'POST /api/auth/register - Register a new user',
+          'POST /api/auth/login - Login user',
+          'POST /api/auth/refresh - Refresh authentication token',
+          'POST /api/auth/logout - Logout user'
+        ]
+      },
+      users: {
+        base: '/api/users',
+        routes: [
+          'GET /api/users/profile - Get user profile',
+          'PUT /api/users/profile - Update user profile',
+          'GET /api/users - Get all users (admin only)',
+          'DELETE /api/users/:id - Delete user (admin only)'
+        ]
+      },
+      accounts: {
+        base: '/api/accounts',
+        routes: [
+          'GET /api/accounts - Get user accounts',
+          'POST /api/accounts - Create new account',
+          'GET /api/accounts/:id - Get specific account',
+          'PUT /api/accounts/:id - Update account'
+        ]
+      },
+      transactions: {
+        base: '/api/transactions',
+        routes: [
+          'GET /api/transactions - Get transactions',
+          'POST /api/transactions - Create transaction',
+          'GET /api/transactions/:id - Get specific transaction',
+          'PUT /api/transactions/:id/status - Update transaction status'
+        ]
+      },
+      transferRequests: {
+        base: '/api/transfer-requests',
+        routes: [
+          'GET /api/transfer-requests - Get transfer requests',
+          'POST /api/transfer-requests - Create transfer request',
+          'PUT /api/transfer-requests/:id - Update transfer request'
+        ]
+      },
+      cards: {
+        base: '/api/cards',
+        routes: [
+          'GET /api/cards - Get user cards',
+          'POST /api/cards - Create new card',
+          'PUT /api/cards/:id - Update card',
+          'DELETE /api/cards/:id - Delete card'
+        ]
+      },
+      cardRequests: {
+        base: '/api/card-requests',
+        routes: [
+          'GET /api/card-requests - Get card requests',
+          'POST /api/card-requests - Create card request',
+          'PUT /api/card-requests/:id - Update card request status'
+        ]
+      },
+      support: {
+        base: '/api/support',
+        routes: [
+          'GET /api/support - Get support messages',
+          'POST /api/support - Create support message',
+          'PUT /api/support/:id - Update support message'
+        ]
+      },
+      notifications: {
+        base: '/api/notifications',
+        routes: [
+          'GET /api/notifications - Get user notifications',
+          'PUT /api/notifications/:id/read - Mark notification as read',
+          'DELETE /api/notifications/:id - Delete notification'
+        ]
+      },
+      activityLogs: {
+        base: '/api/activity-logs',
+        routes: [
+          'GET /api/activity-logs - Get activity logs'
+        ]
+      }
+    },
+    features: [
+      'JWT Authentication',
+      'Role-based Access Control',
+      'Real-time Notifications via WebSocket',
+      'Rate Limiting',
+      'CORS Security',
+      'File Upload Support',
+      'MongoDB Integration',
+      'Activity Logging'
+    ],
+    websocket: {
+      path: '/socket.io',
+      namespaces: [
+        '/notifications - Real-time notifications'
+      ]
+    },
+    rateLimit: {
+      windowMs: '15 minutes',
+      maxRequests: 100,
+      message: 'Rate limit exceeded'
+    },
+    cors: {
+      allowedOrigins: corsOptions.origin,
+      allowedMethods: corsOptions.methods
+    }
+  });
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    version: process.version
+  });
+});
 
 // Routes
 app.use('/api/auth', authRoutes);

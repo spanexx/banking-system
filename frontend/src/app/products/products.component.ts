@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-products',
@@ -17,6 +18,8 @@ import { RouterModule } from '@angular/router';
   styleUrl: './products.component.scss'
 })
 export class ProductsComponent {
+  imageBaseUrl = environment.imageBaseUrl;
+
   // Add functionality here if needed for product interactions
   learnMore(productType: string) {
     // Implement learn more functionality

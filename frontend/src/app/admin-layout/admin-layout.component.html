@@ -9,8 +9,7 @@
   <aside class="sidebar" [class.collapsed]="isSidebarCollapsed">
     <div class="sidebar-header">
       <div class="logo-container">
-        <img src="images/logo.png" alt="SimpliBank Logo" class="logo" *ngIf="!isSidebarCollapsed">
-        <span class="logo-text" *ngIf="!isSidebarCollapsed">SimpliBank Admin</span>
+        <img src="https://raw.githubusercontent.com/OnapuluAgu/images/main/banking-images/logo.png" alt="SimpliBank Logo" class="logo" *ngIf="!isSidebarCollapsed">        <span class="logo-text" *ngIf="!isSidebarCollapsed">SimpliBank Admin</span>
       </div>
       <button mat-icon-button class="toggle-button" (click)="toggleSidebar()">
         <mat-icon>{{ isSidebarCollapsed ? 'menu' : 'menu_open' }}</mat-icon>

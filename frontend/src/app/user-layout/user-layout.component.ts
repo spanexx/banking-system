@@ -30,6 +30,7 @@ import {
 import { AuthService } from '../services/auth.service';
 import { NotificationService, Notification } from '../services/notification.service';
 import { Subscription } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 
 @Component({
@@ -60,6 +61,8 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
   logoutIcon = faRightFromBracket;
   bellIcon = faBell;
   chevronIcon = faChevronDown;
+  imageBaseUrl = environment.imageBaseUrl;
+  
 
   // Navigation icons
   dashboardIcon = faDashboard;
